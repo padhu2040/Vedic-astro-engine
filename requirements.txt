@@ -1,8 +1,8 @@
-streamlit==1.31.0
-pyswisseph==2.10.3.2
-plotly==5.18.0
-geopy==2.4.1
-timezonefinder==6.2.0
-pytz==2024.1
-fpdf==1.7.2
-google-generativeai==0.3.2
+streamlit
+pyswisseph
+plotly
+geopy
+timezonefinder
+pytz
+fpdf
+google-generativeai
