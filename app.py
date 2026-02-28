@@ -533,7 +533,6 @@ def draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang="English"):
         elif score < 25: pdf.set_text_color(231, 76, 60)
         else: pdf.set_text_color(50, 50, 50)
         
-        # FIXED: Font now obeys the language setting for the score number
         if lang == "Tamil":
             pdf.set_font(font_family, '', 10)
         else:
@@ -543,25 +542,25 @@ def draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang="English"):
         pdf.cell(10, 6, str(score), ln=0)
         
     pdf.set_y(start_y + (12 * 7) + 15)
+
 def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, id_data, lagna_str, moon_str, star_str, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang="English"):
     try:
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
         
-        # 🌟 NEW: Turn on Complex Text Shaping for perfect Tamil grammar!
-        pdf.text_shaping = True
-        
         font_family = 'Arial'
+        
+        # WE ONLY TURN ON TEXT SHAPING FOR TAMIL TO PREVENT ARIAL CRASHES!
         if lang == "Tamil":
             if os.path.exists("NotoSansTamil-Regular.ttf"):
                 pdf.add_font("NotoTamil", "", "NotoSansTamil-Regular.ttf")
                 font_family = 'NotoTamil'
+                pdf.text_shaping = True  
             else:
                 return b"PDF Error: Missing NotoSansTamil-Regular.ttf font file in the folder! Please verify the name in GitHub."
                 
         pdf.add_page()
         
-        # --- Headings ---
         h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
         h_id = "1. சுயவிவரம் (Identity)" if lang == "Tamil" else "1. Identity & Personality"
         h_rasi = "2. ராசி சக்கரம் (Rasi Chakra)" if lang == "Tamil" else "2. Birth Chart (Rasi Chakra)"
@@ -576,7 +575,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         h_micro = "11. நடப்பு தசா (Phase Drill-Down)" if lang == "Tamil" else "11. Phase Drill-Down & Micro-Timing"
         h_remedy = "12. பரிகாரங்கள் (Lucky Lifestyle)" if lang == "Tamil" else "12. Lucky Lifestyle"
         
-        # --- Title ---
         if lang == "Tamil": pdf.set_font(font_family, '', 16)
         else: pdf.set_font("Arial", 'B', 16)
         pdf.cell(0, 10, sanitize_text(h_title), ln=1, align='C')
@@ -591,7 +589,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         pdf.line(10, 30, 200, 30)
         pdf.ln(10)
         
-        # --- Section 1: Identity ---
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
@@ -599,7 +596,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         if lang == "Tamil": write_pdf_section(pdf, [f"நோக்கம்: {id_data['Purpose']}", f"குணம்: {id_data['Personality']}", f"பலங்கள்: {id_data['Strengths']}", f"பலவீனங்கள்: {id_data['Weaknesses']}"], lang)
         else: write_pdf_section(pdf, [f"Life Purpose: {id_data['Purpose']}", f"Core Trait: {id_data['Personality']}", f"Strengths: {id_data['Strengths']}", f"Weaknesses: {id_data['Weaknesses']}"], lang)
         
-        # --- Section 2: Rasi Chart ---
         pdf.ln(5)
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -607,14 +603,12 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         pdf.cell(0, 10, sanitize_text(h_rasi), ln=1)
         draw_pdf_south_indian_chart(pdf, p_pos, lagna_rasi, h_rasi.split(' ')[1] if lang=="Tamil" else "Rasi Chart", lang)
         
-        # --- Section 3: Scorecard ---
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_score), ln=1)
         draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang)
         
-        # --- Section 4: Work & Intellect ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -623,7 +617,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         write_pdf_section(pdf, edu_txt, lang)
         write_pdf_section(pdf, career_txt, lang)
 
-        # --- Section 5: Navamsa & Love ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -633,7 +626,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         draw_pdf_south_indian_chart(pdf, p_d9, d9_lagna_idx, "Navamsa", lang)
         write_pdf_section(pdf, love_txt, lang)
         
-        # --- Section 6: Health ---
         pdf.ln(8)
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -641,7 +633,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         pdf.cell(0, 10, sanitize_text(h_health), ln=1)
         write_pdf_section(pdf, health_txt, lang)
 
-        # --- Section 7: Yogas ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -658,7 +649,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
             pdf.multi_cell(0, 6, sanitize_text(y['Description']))
             pdf.ln(4)
             
-        # --- Section 8: Forecast ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -675,7 +665,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
             pdf.multi_cell(0, 6, sanitize_text(f"Prediction: {data[0]}\nRemedy: {data[1]}"))
             pdf.ln(4)
             
-        # --- Section 9: Transits ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -693,8 +682,7 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
             if lang == "Tamil": pdf.set_font(font_family, '', 14)
             else: pdf.set_font("Arial", 'B', 14)
             pdf.set_text_color(0, 0, 0)
-            sub_h = "Micro-Transits"
-            pdf.cell(0, 8, sanitize_text(sub_h), ln=1)
+            pdf.cell(0, 8, sanitize_text("Micro-Transits"), ln=1)
             if lang == "Tamil": pdf.set_font(font_family, '', 11)
             else: pdf.set_font("Arial", '', 11)
             pdf.set_text_color(40, 40, 40)
@@ -702,7 +690,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
                 pdf.multi_cell(0, 6, sanitize_text(f"- {m['Dates']}: {m['Trigger']}. {m['Impact']}"))
                 pdf.ln(2)
 
-        # --- Section 10: Roadmap ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -719,7 +706,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
             pdf.multi_cell(0, 5, sanitize_text(row['Prediction']))
             pdf.ln(3)
 
-        # --- Section 11: Phase Drill-Down ---
         pdf.add_page()
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
@@ -747,7 +733,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
             pdf.multi_cell(0, 6, sanitize_text(p['Text']))
             pdf.ln(4)
             
-        # --- Section 12: Lucky Lifestyle ---
         if lang == "Tamil": pdf.set_font(font_family, '', 14)
         else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
@@ -757,7 +742,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         pdf.set_text_color(40, 40, 40)
         pdf.multi_cell(0, 6, sanitize_text(f"Key Deity: {guide.get('Deity', '')}\nMantra: {guide.get('Mantra', '')}\nDaily Habit: {guide.get('Daily', '')}\nBenefit: {guide.get('Benefit', '')}\nAccessories: {guide.get('Accessory', '')}\nAvoid: {guide.get('Avoid', '')}"))
         
-        # --- Footer ---
         pdf.ln(10)
         if lang == "Tamil":
             pdf.set_font(font_family, '', 10)
@@ -772,7 +756,6 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         return bytes(out)
     except Exception as e:
         return f"PDF Error: {str(e)}".encode('utf-8')
-
 
 # ==========================================
 # 6. STREAMLIT APP UI & EXECUTION
@@ -1073,9 +1056,11 @@ if st.session_state.report_generated:
                                 chart_context += f"CRITICAL CONTEXT: Target forecast year is {f_year}. "
                                 chart_context += f"For {f_year}, major transits are: Saturn in {ZODIAC[t_data['Saturn']['Rasi']]}, Jupiter in {ZODIAC[t_data['Jupiter']['Rasi']]}, Rahu in {ZODIAC[t_data['Rahu']['Rasi']]}. "
                                 
-                                sys_lang = "poetic, natural, and traditional Tamil (like a wise Nadi astrologer)" if LANG == "Tamil" else "English"
+                                sys_lang = "natural, poetic, and traditional Tamil script (like a wise Nadi astrologer)" if LANG == "Tamil" else "English"
                                 persona = "You are a wise, highly accurate, and compassionate Vedic Astrologer. "
-                                rules = f"Based STRICTLY on the mathematical chart data, transits, and our conversation history, answer the user's question practically in 3 to 4 sentences. CRITICAL RULE: If the user explicitly asks you to speak in a specific language in their prompt, you MUST use that requested language. Otherwise, default to answering entirely in {sys_lang}. Do NOT sound like a machine translation. Always conclude with a brief, encouraging remedy."
+                                
+                                # UPGRADED RULE TO FORCE THE AI TO SPEAK TAMIL
+                                rules = f"Answer the user's question practically in 3 to 4 sentences based on the data. CRITICAL: You are fully bilingual. If the user asks for Tamil, or if the interface language is set to Tamil, you MUST output your ENTIRE response in Tamil script. Never apologize or say you can only speak English. Default Language for this response: {sys_lang}. Always conclude with a practical remedy."
                                 
                                 conversation_history = "Chat History:\n"
                                 for msg in st.session_state.messages[:-1]: 
