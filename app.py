@@ -622,7 +622,6 @@ def get_south_indian_chart_html(p_pos, lagna_rasi, title, lang="English"):
         g[r].append(f"<span style='font-size:12px; font-weight:bold; color:#2c3e50;'>{name}</span>")
     for i in g: g[i] = "<br>".join(g[i])
     z = ZODIAC_TA if lang == "Tamil" else ZODIAC
-    # Create a helper to safely get the zodiac name by index (1-12)
     def get_z(idx):
         if isinstance(z, dict): return z.get(idx, "")
         return z[idx] if idx < len(z) else ""
@@ -868,7 +867,7 @@ if st.session_state.report_generated:
         if r1 == p_d9[p]: status = "VARGOTTAMA"
         elif dig == "Exalted": status = "ROYAL"
         elif dig == "Neecha": status = "WEAK"
-        master_table.append({"Planet": p, "Rasi": ZODIAC_TA[r1] if LANG=="Tamil" else ZODIAC[r1], "House": h, "Bhava": bhava_h, "Dignity": dig, "Status": status})
+        master_table.append({"Planet": p, "Rasi": ZODIAC_TA.get(r1, "") if LANG=="Tamil" else ZODIAC[r1], "House": h, "Bhava": bhava_h, "Dignity": dig, "Status": status})
 
     p_pos["Lagna"] = lagna_rasi
     bhava_placements["Ketu"] = ketu_bhava_h 
@@ -908,8 +907,8 @@ if st.session_state.report_generated:
     c_left, c_right = st.columns([3, 1])
     with c_left:
         st.subheader(f"Analysis for {name_in}" if LANG=="English" else f"ஜோதிட அறிக்கை: {name_in}")
-        l_name = ZODIAC_TA[lagna_rasi] if LANG == "Tamil" else ZODIAC[lagna_rasi]
-        m_name = ZODIAC_TA[moon_rasi] if LANG == "Tamil" else ZODIAC[moon_rasi]
+        l_name = ZODIAC_TA.get(lagna_rasi, "") if LANG == "Tamil" else ZODIAC[lagna_rasi]
+        m_name = ZODIAC_TA.get(moon_rasi, "") if LANG == "Tamil" else ZODIAC[moon_rasi]
         st.markdown(f"> **{'லக்னம்' if LANG=='Tamil' else 'Lagna'}:** {l_name} | **{'ராசி' if LANG=='Tamil' else 'Moon'}:** {m_name} | **{'நட்சத்திரம்' if LANG=='Tamil' else 'Star'}:** {nak}")
     
     with c_right:
@@ -1026,7 +1025,7 @@ if st.session_state.report_generated:
             st.markdown(p['Text'].replace('\n', '  \n'))
             st.divider()
 
-        st.markdown(f"#### {'Life Chapters' if LANG=='English' else 'மகா தசை விவரங்கள்'}")
+        st.markdown(f"#### {'Life Chapters (Timeline)' if LANG=='English' else 'மகா தசை விவரங்கள் (காலக்கோடு)'}")
         planet_colors = {"Sun": "#d35400", "Moon": "#95a5a6", "Mars": "#c0392b", "Mercury": "#27ae60", "Jupiter": "#f39c12", "Venus": "#8e44ad", "Saturn": "#2c3e50", "Rahu": "#34495e", "Ketu": "#7f8c8d", "சூரியன்": "#d35400", "சந்திரன்": "#95a5a6", "செவ்வாய்": "#c0392b", "புதன்": "#27ae60", "குரு": "#f39c12", "சுக்கிரன்": "#8e44ad", "சனி": "#2c3e50", "ராகு": "#34495e", "கேது": "#7f8c8d"}
         dasha_names = []
         start_years = []
@@ -1045,6 +1044,19 @@ if st.session_state.report_generated:
         ))
         fig_timeline.update_layout(barmode='stack', height=100, margin=dict(l=0, r=0, t=10, b=0), template='plotly_white', showlegend=False, xaxis=dict(title=None, showticklabels=True), yaxis=dict(showticklabels=False, fixedrange=True))
         st.plotly_chart(fig_timeline, use_container_width=True)
+
+        # THE MISSING TABLE IS RESTORED HERE!
+        h_age = "வயது" if LANG == "Tamil" else "Age"
+        h_yrs = "ஆண்டுகள்" if LANG == "Tamil" else "Years"
+        h_md = "மகா தசை" if LANG == "Tamil" else "Mahadasha"
+        h_pred = "கணிப்பு" if LANG == "Tamil" else "Prediction"
+
+        md_table_html = f"<table style='width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px; margin-top: 20px;'><tr style='border-bottom: 2px solid #ddd; background-color: #fdfdfd;'><th style='padding: 10px 8px; text-align: left; width: 10%;'>{h_age}</th><th style='padding: 10px 8px; text-align: left; width: 10%;'>{h_yrs}</th><th style='padding: 10px 8px; text-align: left; width: 15%;'>{h_md}</th><th style='padding: 10px 8px; text-align: left; width: 65%;'>{h_pred}</th></tr>"
+        for row in mahadasha_data:
+            s_year, e_year = row['Years'].split(' - ')
+            md_table_html += f"<tr style='border-bottom: 1px solid #eee;'><td style='padding: 10px 8px; vertical-align: top;'>{row['Age (From-To)']}</td><td style='padding: 10px 8px; vertical-align: top;'>{s_year}<br>{e_year}</td><td style='padding: 10px 8px; vertical-align: top;'><b>{row['Mahadasha']}</b></td><td style='padding: 10px 8px; vertical-align: top;'>{row['Prediction']}</td></tr>"
+        md_table_html += "</table>"
+        st.markdown(md_table_html, unsafe_allow_html=True)
 
     with t8:
         st.subheader("💬 Ask the AI Astrologer" if LANG == "English" else "💬 AI ஜோதிடரிடம் கேளுங்கள்")
