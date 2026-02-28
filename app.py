@@ -621,7 +621,7 @@ def get_south_indian_chart_html(p_pos, lagna_rasi, title, lang="English"):
         name = TAMIL_NAMES.get(p, p[:2]) if lang == "Tamil" else p[:2]
         g[r].append(f"<span style='font-size:12px; font-weight:bold; color:#2c3e50;'>{name}</span>")
     for i in g: g[i] = "<br>".join(g[i])
-    z = [""] + (["மேஷம்", "ரிஷபம்", "மிதுனம்", "கடகம்", "சிம்மம்", "கன்னி", "துலாம்", "விருச்சிகம்", "தனுசு", "மகரம்", "கும்பம்", "மீனம்"] if lang == "Tamil" else ["Mesha", "Rishabha", "Mithuna", "Kataka", "Simha", "Kanya", "Thula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"])
+    z = [""] + (list(ZODIAC_TA.values()) if lang == "Tamil" else list(ZODIAC.values()))
     return f"<div style='max-width: 450px; margin: auto; font-family: sans-serif;'><table style='width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; background-color: #ffffff; border: 2px solid #333;'><tr><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[12]} (12)</div>{g[12]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[1]} (1)</div>{g[1]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[2]} (2)</div>{g[2]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[3]} (3)</div>{g[3]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[11]} (11)</div>{g[11]}</td><td colspan='2' rowspan='2' style='border: none; vertical-align: middle; font-weight: bold; font-size: 16px; color:#2c3e50; background-color: #ffffff;'>{title}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[4]} (4)</div>{g[4]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[10]} (10)</div>{g[10]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[5]} (5)</div>{g[5]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[9]} (9)</div>{g[9]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[8]} (8)</div>{g[8]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[7]} (7)</div>{g[7]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[6]} (6)</div>{g[6]}</td></tr></table></div>"
 
 # ==========================================
@@ -655,9 +655,8 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
         score_html += f"<tr><td width='15%'><b>{lbl} {house_num}</b></td><td width='75%'><div class='bar {color_class}' style='width: {bar_w}%;'></div></td><td width='10%'><b>{score}</b></td></tr>"
     score_html += "</table>"
 
-    z_names = [""] + (list(ZODIAC_TA.values()) if lang == "Tamil" else list(ZODIAC.values()))
-    l_str = z_names[lagna_rasi]
-    m_str = z_names[moon_rasi]
+    l_str = ZODIAC_TA[lagna_rasi] if lang == "Tamil" else ZODIAC[lagna_rasi]
+    m_str = ZODIAC_TA[moon_rasi] if lang == "Tamil" else ZODIAC[moon_rasi]
 
     html = f"""
     <!DOCTYPE html>
@@ -672,20 +671,25 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
         h4 {{ color: #2c3e50; margin-bottom: 5px; font-size: 16px; margin-top: 20px; }}
         p {{ margin-top: 5px; text-align: justify; font-size: 15px; color: #444; }}
         .subtitle {{ text-align: center; font-style: italic; color: #7f8c8d; margin-bottom: 40px; font-size: 16px; }}
+        
         .bar-chart {{ width: 100%; border-collapse: collapse; margin-top: 20px; page-break-inside: avoid; font-size: 15px; }}
         .bar-chart td {{ padding: 8px 0; vertical-align: middle; border-bottom: 1px dashed #eee; }}
         .bar {{ background-color: #95a5a6; height: 22px; border-radius: 4px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }}
         .bar.high {{ background-color: #27ae60; }}
         .bar.low {{ background-color: #e74c3c; }}
+        
         .page-break {{ page-break-before: always; margin-top: 40px; }}
         .footer {{ text-align: center; font-size: 13px; color: #95a5a6; margin-top: 60px; border-top: 1px solid #eee; padding-top: 20px; }}
+        
         table.timeline {{ width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; page-break-inside: auto; }}
         table.timeline th, table.timeline td {{ padding: 10px; text-align: left; border-bottom: 1px solid #ddd; vertical-align: top; }}
         table.timeline tr:nth-child(even) {{ background-color: #fcfcfc; }}
         table.timeline th {{ background-color: #f0f3f4; font-weight: bold; color: #2c3e50; }}
+        
         .remedy-box {{ background-color: #fdfae6; border-left: 4px solid #f1c40f; padding: 15px; margin-top: 20px; border-radius: 0 4px 4px 0; }}
         .remedy-box ul {{ margin: 0; padding-left: 20px; font-size: 15px; }}
         .remedy-box li {{ margin-bottom: 8px; }}
+        
         @media print {{
             body {{ padding: 0; max-width: 100%; }}
             .page-break {{ page-break-before: always; }}
