@@ -9,11 +9,14 @@ from fpdf import FPDF
 import google.generativeai as genai
 import os
 
-# Safely import the API key from your config file
+# Securely fetch API key from Streamlit Cloud Secrets, or fallback to local config
 try:
-    from api_config import GEMINI_API_KEY
-except ImportError:
-    GEMINI_API_KEY = ""
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+except:
+    try:
+        from api_config import GEMINI_API_KEY
+    except ImportError:
+        GEMINI_API_KEY = ""
 
 # Import databases
 from database import (
@@ -540,13 +543,15 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
     try:
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
-font_family = 'Arial'
+        
+        font_family = 'Arial'
         if lang == "Tamil":
             if os.path.exists("NotoSansTamil-Regular.ttf"):
                 pdf.add_font("NotoTamil", "", "NotoSansTamil-Regular.ttf")
                 font_family = 'NotoTamil'
             else:
-                return b"PDF Error: Missing NotoSansTamil-Regular.ttf font file in the folder! Please verify the name in GitHub."              
+                return b"PDF Error: Missing NotoSansTamil-Regular.ttf font file in the folder! Please verify the name in GitHub."
+                
         pdf.add_page()
         
         h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
@@ -760,7 +765,6 @@ if st.session_state.report_generated:
     with c_right:
         eng_id_data = identity_db.get(ZODIAC[lagna_rasi], identity_db["Mesha"])
         
-        # --- NEW SAFTEY CHECK FOR PDF EXPORT ---
         pdf_bytes = generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, eng_id_data, ZODIAC[lagna_rasi], ZODIAC[moon_rasi], nak, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang=LANG)
         
         if pdf_bytes.startswith(b"PDF Error:"):
@@ -768,7 +772,6 @@ if st.session_state.report_generated:
         else:
             st.download_button(label="📄 Download PDF Report", data=pdf_bytes, file_name=f"{name_in}_Astro_Report.pdf", mime="application/pdf")
 
-    # Dynamic UI Mapping
     db_id = TAMIL_IDENTITY_DB if LANG == "Tamil" else identity_db
     db_lev = TAMIL_LEVERAGE_GUIDE if LANG == "Tamil" else house_leverage_guide
     db_eff = TAMIL_EFFORT_GUIDE if LANG == "Tamil" else house_effort_guide
