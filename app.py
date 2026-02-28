@@ -543,11 +543,13 @@ def draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang="English"):
         pdf.cell(10, 6, str(score), ln=0)
         
     pdf.set_y(start_y + (12 * 7) + 15)
-
 def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, id_data, lagna_str, moon_str, star_str, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang="English"):
     try:
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
+        
+        # 🌟 NEW: Turn on Complex Text Shaping for perfect Tamil grammar!
+        pdf.text_shaping = True
         
         font_family = 'Arial'
         if lang == "Tamil":
@@ -559,6 +561,7 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
                 
         pdf.add_page()
         
+        # --- Headings ---
         h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
         h_id = "1. சுயவிவரம் (Identity)" if lang == "Tamil" else "1. Identity & Personality"
         h_rasi = "2. ராசி சக்கரம் (Rasi Chakra)" if lang == "Tamil" else "2. Birth Chart (Rasi Chakra)"
@@ -566,102 +569,202 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         h_work = "4. கல்வி மற்றும் தொழில் (Work & Intellect)" if lang == "Tamil" else "4. Work & Intellect (Education & Career)"
         h_love = "5. திருமணம் (Love & Marriage)" if lang == "Tamil" else "5. Love & Marriage (Navamsa Engine)"
         h_health = "6. ஆரோக்கியம் (Health & Vitality)" if lang == "Tamil" else "6. Health & Vitality"
+        h_yogas = "7. யோகங்கள் (Wealth & Power Yogas)" if lang == "Tamil" else "7. Wealth & Power Yogas"
+        h_fc = "8. வருடாந்திர கணிப்பு (Annual Forecast)" if lang == "Tamil" else "8. Annual Forecast"
+        h_transit = "9. கிரகப் பெயர்ச்சிகள் (Planetary Transits)" if lang == "Tamil" else "9. Planetary Transits"
+        h_roadmap = "10. தசா புக்தி (Strategic Roadmap)" if lang == "Tamil" else "10. Strategic Roadmap (Life Chapters)"
+        h_micro = "11. நடப்பு தசா (Phase Drill-Down)" if lang == "Tamil" else "11. Phase Drill-Down & Micro-Timing"
+        h_remedy = "12. பரிகாரங்கள் (Lucky Lifestyle)" if lang == "Tamil" else "12. Lucky Lifestyle"
         
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 16)
-        else:
-            pdf.set_font("Arial", 'B', 16)
-            
+        # --- Title ---
+        if lang == "Tamil": pdf.set_font(font_family, '', 16)
+        else: pdf.set_font("Arial", 'B', 16)
         pdf.cell(0, 10, sanitize_text(h_title), ln=1, align='C')
         
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 12)
-        else:
-            pdf.set_font("Arial", 'I', 12)
+        if lang == "Tamil": pdf.set_font(font_family, '', 12)
+        else: pdf.set_font("Arial", 'I', 12)
         
-        l_txt = ZODIAC[lagna_rasi]
-        m_txt = ZODIAC[moon_rasi]
-        if lang == "Tamil":
-            pdf.cell(0, 10, sanitize_text(f"லக்னம்: {l_txt} | ராசி: {m_txt} | நட்சத்திரம்: {star_str}"), ln=1, align='C')
-        else:
-            pdf.cell(0, 10, sanitize_text(f"Lagna: {lagna_str} | Moon: {moon_str} | Star: {star_str}"), ln=1, align='C')
+        l_txt, m_txt = ZODIAC[lagna_rasi], ZODIAC[moon_rasi]
+        if lang == "Tamil": pdf.cell(0, 10, sanitize_text(f"லக்னம்: {l_txt} | ராசி: {m_txt} | நட்சத்திரம்: {star_str}"), ln=1, align='C')
+        else: pdf.cell(0, 10, sanitize_text(f"Lagna: {lagna_str} | Moon: {moon_str} | Star: {star_str}"), ln=1, align='C')
             
         pdf.line(10, 30, 200, 30)
         pdf.ln(10)
         
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 14)
-        else:
-            pdf.set_font("Arial", 'B', 14)
-            
+        # --- Section 1: Identity ---
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_id), ln=1)
+        if lang == "Tamil": write_pdf_section(pdf, [f"நோக்கம்: {id_data['Purpose']}", f"குணம்: {id_data['Personality']}", f"பலங்கள்: {id_data['Strengths']}", f"பலவீனங்கள்: {id_data['Weaknesses']}"], lang)
+        else: write_pdf_section(pdf, [f"Life Purpose: {id_data['Purpose']}", f"Core Trait: {id_data['Personality']}", f"Strengths: {id_data['Strengths']}", f"Weaknesses: {id_data['Weaknesses']}"], lang)
         
-        if lang == "Tamil":
-            write_pdf_section(pdf, [f"நோக்கம்: {id_data['Purpose']}", f"குணம்: {id_data['Personality']}", f"பலங்கள்: {id_data['Strengths']}", f"பலவீனங்கள்: {id_data['Weaknesses']}"], lang)
-        else:
-            write_pdf_section(pdf, [f"Life Purpose: {id_data['Purpose']}", f"Core Trait: {id_data['Personality']}", f"Strengths: {id_data['Strengths']}", f"Weaknesses: {id_data['Weaknesses']}"], lang)
-        
+        # --- Section 2: Rasi Chart ---
         pdf.ln(5)
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 14)
-        else:
-            pdf.set_font("Arial", 'B', 14)
-            
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_rasi), ln=1)
         draw_pdf_south_indian_chart(pdf, p_pos, lagna_rasi, h_rasi.split(' ')[1] if lang=="Tamil" else "Rasi Chart", lang)
         
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 14)
-        else:
-            pdf.set_font("Arial", 'B', 14)
-            
+        # --- Section 3: Scorecard ---
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_score), ln=1)
         draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang)
         
+        # --- Section 4: Work & Intellect ---
         pdf.add_page()
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 14)
-        else:
-            pdf.set_font("Arial", 'B', 14)
-            
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_work), ln=1)
         write_pdf_section(pdf, edu_txt, lang)
         write_pdf_section(pdf, career_txt, lang)
 
+        # --- Section 5: Navamsa & Love ---
         pdf.add_page()
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 14)
-        else:
-            pdf.set_font("Arial", 'B', 14)
-            
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_love), ln=1)
         d9_lagna_idx = get_navamsa_chart(p_pos.get("Lagna", lagna_rasi*30))
         draw_pdf_south_indian_chart(pdf, p_d9, d9_lagna_idx, "Navamsa", lang)
         write_pdf_section(pdf, love_txt, lang)
         
+        # --- Section 6: Health ---
         pdf.ln(8)
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 14)
-        else:
-            pdf.set_font("Arial", 'B', 14)
-            
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
         pdf.set_text_color(0, 0, 0)
         pdf.cell(0, 10, sanitize_text(h_health), ln=1)
         write_pdf_section(pdf, health_txt, lang)
 
-        # FIXED: Footer font now perfectly obeys the language setting
+        # --- Section 7: Yogas ---
+        pdf.add_page()
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, sanitize_text(h_yogas), ln=1)
+        for y in yogas:
+            if lang == "Tamil": pdf.set_font(font_family, '', 12)
+            else: pdf.set_font("Arial", 'B', 12)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 8, sanitize_text(f"{y['Name']} ({y['Type']})"), ln=1)
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", '', 11)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 6, sanitize_text(y['Description']))
+            pdf.ln(4)
+            
+        # --- Section 8: Forecast ---
+        pdf.add_page()
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, sanitize_text(h_fc), ln=1)
+        for cat, data in fc.items():
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", 'B', 11)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 6, sanitize_text(f"{cat}:"), ln=1)
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", '', 11)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 6, sanitize_text(f"Prediction: {data[0]}\nRemedy: {data[1]}"))
+            pdf.ln(4)
+            
+        # --- Section 9: Transits ---
+        pdf.add_page()
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, sanitize_text(h_transit), ln=1)
+        for txt in transit_texts:
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", '', 11)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 6, sanitize_text(txt))
+            pdf.ln(4)
+        
+        if micro_transits:
+            pdf.ln(5)
+            if lang == "Tamil": pdf.set_font(font_family, '', 14)
+            else: pdf.set_font("Arial", 'B', 14)
+            pdf.set_text_color(0, 0, 0)
+            sub_h = "Micro-Transits"
+            pdf.cell(0, 8, sanitize_text(sub_h), ln=1)
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", '', 11)
+            pdf.set_text_color(40, 40, 40)
+            for m in micro_transits: 
+                pdf.multi_cell(0, 6, sanitize_text(f"- {m['Dates']}: {m['Trigger']}. {m['Impact']}"))
+                pdf.ln(2)
+
+        # --- Section 10: Roadmap ---
+        pdf.add_page()
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, sanitize_text(h_roadmap), ln=1)
+        for row in mahadasha_data:
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", 'B', 11)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 8, sanitize_text(f"Age {row['Age (From-To)']} | {row['Mahadasha']} Dasha ({row['Years']})"), ln=1)
+            if lang == "Tamil": pdf.set_font(font_family, '', 10)
+            else: pdf.set_font("Arial", '', 10)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 5, sanitize_text(row['Prediction']))
+            pdf.ln(3)
+
+        # --- Section 11: Phase Drill-Down ---
+        pdf.add_page()
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, sanitize_text(h_micro), ln=1)
+        if pd_info:
+            if lang == "Tamil": pdf.set_font(font_family, '', 12)
+            else: pdf.set_font("Arial", 'B', 12)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 8, sanitize_text("IMMEDIATE FOCUS"), ln=1)
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", '', 11)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 6, sanitize_text(f"Active Dates: {pd_info['Start']} to {pd_info['End']}\nCurrent Micro-Ruler: {pd_info['PD']} (Operating under {pd_info['MD']} / {pd_info['AD']})"))
+            pdf.ln(4)
+
+        for p in phases:
+            if lang == "Tamil": pdf.set_font(font_family, '', 12)
+            else: pdf.set_font("Arial", 'B', 12)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 8, sanitize_text(f"{p['Type']}: {p['Phase']} ({p['Dates']})"), ln=1)
+            if lang == "Tamil": pdf.set_font(font_family, '', 11)
+            else: pdf.set_font("Arial", '', 11)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 6, sanitize_text(p['Text']))
+            pdf.ln(4)
+            
+        # --- Section 12: Lucky Lifestyle ---
+        if lang == "Tamil": pdf.set_font(font_family, '', 14)
+        else: pdf.set_font("Arial", 'B', 14)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 10, sanitize_text(h_remedy), ln=1)
+        if lang == "Tamil": pdf.set_font(font_family, '', 11)
+        else: pdf.set_font("Arial", '', 11)
+        pdf.set_text_color(40, 40, 40)
+        pdf.multi_cell(0, 6, sanitize_text(f"Key Deity: {guide.get('Deity', '')}\nMantra: {guide.get('Mantra', '')}\nDaily Habit: {guide.get('Daily', '')}\nBenefit: {guide.get('Benefit', '')}\nAccessories: {guide.get('Accessory', '')}\nAvoid: {guide.get('Avoid', '')}"))
+        
+        # --- Footer ---
         pdf.ln(10)
         if lang == "Tamil":
             pdf.set_font(font_family, '', 10)
             footer = "வேத ஜோதிட என்ஜின் மூலம் உருவாக்கப்பட்டது"
         else:
             pdf.set_font("Arial", 'I', 10)
-            footer = "Generated by Vedic Astro Engine"
+            footer = "Generated by Vedic Astro Engine (Platinum Edition)"
             
         pdf.cell(0, 10, txt=sanitize_text(footer), align='C', ln=1)
         
@@ -669,6 +772,7 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
         return bytes(out)
     except Exception as e:
         return f"PDF Error: {str(e)}".encode('utf-8')
+
 
 # ==========================================
 # 6. STREAMLIT APP UI & EXECUTION
