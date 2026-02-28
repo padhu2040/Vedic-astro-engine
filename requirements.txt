@@ -4,5 +4,5 @@ plotly
 geopy
 timezonefinder
 pytz
-fpdf
+fpdf2
 google-generativeai
