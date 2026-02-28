@@ -102,32 +102,32 @@ def determine_house(planet_lon, cusps):
     return 1
 
 # ==========================================
-# 3. DEEP ANALYSIS ENGINES
+# 3. DEEP ANALYSIS ENGINES (FULL PLATINUM TEXT RESTORED)
 # ==========================================
 def scan_yogas(p_pos, lagna_rasi):
     yogas = []
     p_houses = {p: ((r - lagna_rasi + 1) if (r - lagna_rasi + 1) > 0 else (r - lagna_rasi + 1) + 12) for p, r in p_pos.items() if p != "Lagna"}
     
     if p_pos.get("Sun") == p_pos.get("Mercury"):
-        yogas.append({"Name": "Budhaditya Yoga", "Type": "Intellect & Commerce", "Description": f"The Sun and Mercury are structurally conjunct in your {p_houses.get('Sun')}th House. This forms a highly analytical and brilliant business mind. You combine the executive authority of the Sun with the tactical communication of Mercury, indicating strong wealth potential through advisory, technology, trade, or writing."})
+        yogas.append({"Name": "Budhaditya Yoga", "Type": "Intellect & Commerce", "Description": f"The Sun and Mercury are structurally conjunct in your {p_houses.get('Sun')}th House. This forms a highly analytical and brilliant business mind. You combine the executive authority of the Sun with the tactical communication of Mercury, indicating strong wealth potential through advisory, technology, trade, or writing. This power peaks during their respective dashas."})
     
     if "Jupiter" in p_pos and "Moon" in p_pos:
         jup_from_moon = (p_pos["Jupiter"] - p_pos["Moon"] + 1) if (p_pos["Jupiter"] - p_pos["Moon"] + 1) > 0 else (p_pos["Jupiter"] - p_pos["Moon"] + 1) + 12
         if jup_from_moon in [1, 4, 7, 10]:
-            yogas.append({"Name": "Gajakesari Yoga", "Type": "Fame & Institutional Protection", "Description": "Jupiter is placed in a foundational angle from your Natal Moon. This is an elite combination for earning widespread respect and divine protection. It grants a noble reputation, social comfort, and the unique ability to defeat competitors through wisdom and diplomacy rather than brute force."})
+            yogas.append({"Name": "Gajakesari Yoga", "Type": "Fame & Institutional Protection", "Description": "Jupiter is placed in a foundational angle from your Natal Moon. This is an elite combination for earning widespread respect and divine protection. It grants a noble reputation, social comfort, and the unique ability to defeat competitors through wisdom and diplomacy rather than brute force. It guards against poverty."})
     
     pm_planets = {"Mars": "Ruchaka", "Mercury": "Bhadra", "Jupiter": "Hamsa", "Venus": "Malavya", "Saturn": "Sasa"}
     for p, y_name in pm_planets.items():
         if p in p_houses and p_houses[p] in [1, 4, 7, 10] and get_dignity(p, p_pos[p]) in ["Own", "Exalted"]:
-            yogas.append({"Name": f"{y_name} Mahapurusha Yoga", "Type": "Exceptional Domain Authority", "Description": f"{p} is exceptionally strong in a foundational angle ({p_houses[p]}th House). You are mathematically destined to be a recognized authority in the domain ruled by {p}. This grants immense psychological resilience and elevates your status significantly."})
+            yogas.append({"Name": f"{y_name} Mahapurusha Yoga", "Type": "Exceptional Domain Authority", "Description": f"{p} is exceptionally strong in a foundational angle ({p_houses[p]}th House). You are mathematically destined to be a recognized authority in the domain ruled by {p}. This grants immense psychological resilience and elevates your status significantly above your peers."})
     
     lord_9 = RASI_RULERS[(lagna_rasi + 8) % 12 or 12]
     lord_10 = RASI_RULERS[(lagna_rasi + 9) % 12 or 12]
     if p_pos.get(lord_9) == p_pos.get(lord_10) and lord_9 != lord_10:
-        yogas.append({"Name": "Dharma Karmadhipati Yoga", "Type": "Ultimate Career Destiny", "Description": f"The rulers of your 9th House of Luck and 10th House of Career are united. This represents the highest form of professional Raja Yoga. Your internal life purpose and your external profession are seamlessly aligned."})
+        yogas.append({"Name": "Dharma Karmadhipati Yoga", "Type": "Ultimate Career Destiny", "Description": f"The rulers of your 9th House of Luck and 10th House of Career are united. This represents the highest form of professional Raja Yoga. Your internal life purpose and your external profession are seamlessly aligned. The universe will frequently open professional doors for you that remain permanently closed to others."})
     
     if not yogas:
-        yogas.append({"Name": "Independent Karma Yoga", "Type": "Self-Made Destiny", "Description": "Your chart does not rely on passive, inherited yogas. Instead, your success is generated purely through active free-will and executing the specific strategies highlighted in your House Scorecard."})
+        yogas.append({"Name": "Independent Karma Yoga", "Type": "Self-Made Destiny", "Description": "Your chart does not rely on passive, inherited yogas. Instead, your success is generated purely through active free-will and executing the specific strategies highlighted in your House Scorecard. You are the sole architect of your empire."})
     
     return yogas
 
@@ -137,19 +137,21 @@ def analyze_education(p_pos, lagna_rasi):
     mercury_dig = get_dignity("Mercury", p_pos["Mercury"])
     
     analysis.append("#### Academic Profile & Learning Style")
-    analysis.append(f"Your primary intellect and academic capacity are governed by the 5th House lord, {lord_5}. This indicates that you learn best when the subject matter naturally aligns with {lord_5}'s energy.")
-    if mercury_dig in ["Exalted", "Own"]: analysis.append(f"Because Mercury (the planet of logic) is highly dignified ({mercury_dig}), your capacity to process complex data is elite. You excel in technical, analytical, or heavily communicative fields.")
-    elif mercury_dig == "Neecha": analysis.append("Your Mercury is mathematically debilitated, which actually means you possess highly intuitive, abstract intelligence rather than strict rote-memorization skills.")
-    else: analysis.append("Your logical processing is balanced. You can apply yourself to a wide variety of subjects successfully, provided you maintain academic discipline.")
+    analysis.append(f"Your primary intellect and academic capacity are governed by the 5th House lord, {lord_5}. This indicates that you learn best when the subject matter naturally aligns with {lord_5}'s energy. You do not just memorize; you need the material to resonate with your core drive.")
     
-    analysis.append("#### Strategic Application")
-    if lord_5 == "Mars": analysis.append("Apply your knowledge through immediate, hands-on execution. Your primary improvement opportunity is patience.")
-    elif lord_5 == "Venus": analysis.append("Apply your knowledge by making systems more harmonious or aesthetically pleasing.")
-    elif lord_5 == "Mercury": analysis.append("Apply your learnings by teaching, writing, or building analytical frameworks.")
-    elif lord_5 == "Jupiter": analysis.append("Apply your wisdom in advisory, mentorship, or policy-making roles.")
-    elif lord_5 == "Saturn": analysis.append("Apply your knowledge to build long-lasting, highly structured systems.")
-    elif lord_5 == "Sun": analysis.append("Apply your intellect to take on absolute leadership and public authority roles.")
-    elif lord_5 == "Moon": analysis.append("Apply your learnings to emotionally intelligent leadership, HR, or healing.")
+    if mercury_dig in ["Exalted", "Own"]: analysis.append(f"Because Mercury (the planet of logic) is highly dignified ({mercury_dig}), your capacity to process complex data is elite. You excel in technical, analytical, or heavily communicative fields. You can out-study your peers easily.")
+    elif mercury_dig == "Neecha": analysis.append("Your Mercury is mathematically debilitated, which actually means you possess highly intuitive, abstract intelligence rather than strict rote-memorization skills. Traditional classroom testing may frustrate you, but you excel in creative or big-picture problem-solving.")
+    else: analysis.append("Your logical processing is balanced. You can apply yourself to a wide variety of subjects successfully, provided you maintain academic discipline and structured study routines.")
+    
+    analysis.append("#### Strategic Application & Growth Opportunities")
+    if lord_5 == "Mars": analysis.append("Apply your knowledge through immediate, hands-on execution. Your primary improvement opportunity is patience; do not skip foundational theories in a rush to see results.")
+    elif lord_5 == "Venus": analysis.append("Apply your knowledge by making systems more harmonious or aesthetically pleasing. Your primary gap to close is avoiding difficult or 'ugly' subjects; lean into discomfort to grow.")
+    elif lord_5 == "Mercury": analysis.append("Apply your learnings by teaching, writing, or building analytical frameworks. Your gap is distraction; consciously focus on mastering one subject before jumping to the next.")
+    elif lord_5 == "Jupiter": analysis.append("Apply your wisdom in advisory, mentorship, or policy-making roles. Your gap to close is dogma; remain open to new, unconventional data that challenges your existing beliefs.")
+    elif lord_5 == "Saturn": analysis.append("Apply your knowledge to build long-lasting, highly structured systems. Your gap to close is speed; learn to make quicker decisions even when you don't have 100% of the data.")
+    elif lord_5 == "Sun": analysis.append("Apply your intellect to take on absolute leadership and public authority roles. Your primary gap to close is delegating; trust others to handle the details so you can focus on the vision.")
+    elif lord_5 == "Moon": analysis.append("Apply your learnings to emotionally intelligent leadership, HR, or healing. Your primary gap is objective detachment; learn to separate your personal feelings from professional data.")
+    
     return analysis
 
 def analyze_health(p_pos, lagna_rasi):
@@ -159,18 +161,20 @@ def analyze_health(p_pos, lagna_rasi):
     lord_6 = RASI_RULERS[(lagna_rasi + 5) % 12 or 12]
     
     analysis.append("#### Core Physical Resilience")
-    if ll_dig in ["Exalted", "Own"]: analysis.append(f"Your Ascendant Lord ({lagna_lord}) is exceptionally strong. This grants you a highly robust physical constitution and excellent natural immunity.")
-    elif ll_dig == "Neecha": analysis.append(f"Your Ascendant Lord ({lagna_lord}) is weak by sign placement. Your physical energy is finite and must be carefully managed.")
-    else: analysis.append(f"Your Ascendant Lord ({lagna_lord}) is in a neutral state. Your physical resilience is average. It will directly reflect your lifestyle choices.")
+    if ll_dig in ["Exalted", "Own"]: analysis.append(f"Your Ascendant Lord ({lagna_lord}) is exceptionally strong. This grants you a highly robust physical constitution and excellent natural immunity. You recover from illness and physical exhaustion much faster than average.")
+    elif ll_dig == "Neecha": analysis.append(f"Your Ascendant Lord ({lagna_lord}) is weak by sign placement. Your physical energy is finite and must be carefully managed. You cannot rely on 'natural' vitality; you must strictly enforce dietary and sleep discipline to avoid chronic fatigue.")
+    else: analysis.append(f"Your Ascendant Lord ({lagna_lord}) is in a neutral state. Your physical resilience is average. It will directly reflect your lifestyle choices—good routines yield high energy, while poor habits will immediately show physical consequences.")
     
     analysis.append("#### Vulnerabilities & Preventative Care")
-    if lord_6 == "Mars": analysis.append("Watch for inflammation, heat-related issues, blood pressure spikes, and physical accidents.")
-    elif lord_6 == "Venus": analysis.append("Watch for issues related to sugar intake, kidneys, and hormonal imbalances.")
-    elif lord_6 == "Mercury": analysis.append("Watch for nervous system exhaustion, anxiety, and digestive/gut issues.")
-    elif lord_6 == "Jupiter": analysis.append("Watch for issues related to liver function, weight gain, and cholesterol.")
-    elif lord_6 == "Saturn": analysis.append("Watch for bone density issues, joint stiffness, arthritis, and chronic, slow-moving ailments.")
-    elif lord_6 == "Sun": analysis.append("Watch for heart health, eyesight deterioration, and upper back/spine issues.")
-    elif lord_6 == "Moon": analysis.append("Watch for water retention, chest/lung congestion, and heavily psychosomatic illnesses.")
+    analysis.append(f"The 6th House of acute health is ruled by {lord_6}. This points to the specific physiological systems you must proactively monitor and protect throughout your life.")
+    if lord_6 == "Mars": analysis.append("Watch for inflammation, heat-related issues, blood pressure spikes, and physical accidents. You must find a healthy outlet for stress to avoid migraines or physical burnout.")
+    elif lord_6 == "Venus": analysis.append("Watch for issues related to sugar intake, kidneys, and hormonal imbalances. Maintaining a very clean, structured diet is your primary preventative medicine.")
+    elif lord_6 == "Mercury": analysis.append("Watch for nervous system exhaustion, anxiety, and digestive/gut issues. High stress immediately impacts your stomach. Meditation and unplugging from screens are mandatory.")
+    elif lord_6 == "Jupiter": analysis.append("Watch for issues related to liver function, weight gain, and cholesterol. You have a tendency to over-indulge in rich foods or sedentary behavior. Regular cardio is essential.")
+    elif lord_6 == "Saturn": analysis.append("Watch for bone density issues, joint stiffness, arthritis, and chronic, slow-moving ailments. Daily stretching, yoga, and calcium management are critical as you age.")
+    elif lord_6 == "Sun": analysis.append("Watch for heart health, eyesight deterioration, and upper back/spine issues. Ensure you get adequate sunlight and monitor your cardiovascular system regularly.")
+    elif lord_6 == "Moon": analysis.append("Watch for water retention, chest/lung congestion, and heavily psychosomatic illnesses (where mental stress creates physical symptoms). Emotional peace is your best medicine.")
+    
     return analysis
 
 def analyze_love_marriage(d1_lagna, d9_lagna, p_d9, p_d1):
@@ -179,19 +183,26 @@ def analyze_love_marriage(d1_lagna, d9_lagna, p_d9, p_d1):
     d9_7th_lord = RASI_RULERS[(d9_lagna + 6) % 12 or 12]
     
     analysis.append("#### The Dating Phase vs. The Marriage Phase")
-    analysis.append(f"Your approach to early romance (5th House) is governed by {lord_5}, meaning you initially seek partners who align with {lord_5}'s energy.")
-    analysis.append(f"The 7th House of your Navamsa (D9) reveals your ultimate spousal archetype. To achieve a permanently successful marriage, your partner must fundamentally embody {d9_7th_lord}'s mature traits.")
+    analysis.append(f"Your approach to early romance (5th House) is governed by {lord_5}, meaning you initially seek partners who are exciting, creative, and align with {lord_5}'s specific energy. However, what you *want* in dating is entirely different from what you *need* for a lifelong marriage.")
+    analysis.append(f"The 7th House of your Navamsa (D9) reveals your ultimate spousal archetype. It is ruled by {d9_7th_lord}. To achieve a permanently successful marriage, your partner must fundamentally embody {d9_7th_lord}'s mature traits.")
+    if d9_7th_lord == "Saturn": analysis.append("Expect a marriage built entirely on duty, endurance, and long-term loyalty. It may lack intense early romance, but it grows into an incredibly unbreakable and secure fortress over time.")
+    elif d9_7th_lord in ["Venus", "Moon"]: analysis.append("Your long-term partnerships absolutely thrive on deep emotional connection, mutual aesthetics, and physical comfort. Relentless harmony and active daily care are non-negotiable for success.")
+    elif d9_7th_lord in ["Sun", "Mars"]: analysis.append("Expect a highly dynamic, high-energy marriage. There will be intense passion and mutual pushing towards ambitious goals, but you must consciously and actively manage ego clashes.")
+    elif d9_7th_lord in ["Mercury", "Jupiter"]: analysis.append("Your marriage is fundamentally an intellectual or spiritual friendship. Crystal clear communication, shared life philosophies, and continuous mutual learning are what truly bind you together.")
     
-    analysis.append("#### Venus Strength")
+    analysis.append("#### Venus Strength (The Capacity to Love)")
     venus_dig = get_dignity("Venus", p_d9['Venus'])
-    if venus_dig in ["Exalted", "Own"] or p_d1['Venus'] == p_d9['Venus']: analysis.append("Exceptional. Your capacity to give and receive love matures beautifully over time.")
-    elif venus_dig == "Neecha": analysis.append("Requires active effort. You must consciously work on not being overly critical in intimate relationships.")
-    else: analysis.append("Balanced. Your relationships require standard daily maintenance, mutual respect, and active listening to thrive.")
+    if venus_dig in ["Exalted", "Own"] or p_d1['Venus'] == p_d9['Venus']: analysis.append("Venus Strength: Exceptional. Your capacity to give and receive love matures beautifully over time. Post-marriage, your financial luck, social status, and general life fortune will see a marked, structural increase.")
+    elif venus_dig == "Neecha": analysis.append("Venus Strength: Requires active effort. You must consciously work on not being overly critical or demanding in intimate relationships. Learning to accept the inherent human imperfections in your partner is your major relationship lesson.")
+    else: analysis.append("Venus Strength: Balanced. Your relationships require standard daily maintenance, mutual respect, and active, engaged listening to thrive. Love is a choice you make daily.")
         
+    analysis.append("#### Hidden Strengths (Vargottama Planets)")
     vargottama = [p for p in p_d1.keys() if p != "Lagna" and p in p_d9 and p_d1[p] == p_d9[p]]
     if vargottama:
         v_str = ", ".join(vargottama)
-        analysis.append(f"#### Vargottama Strengths\nPlanets in the exact same sign in D1 and D9 are tremendously powerful. You have {v_str} as Vargottama. These act as unshakeable structural pillars in your life.")
+        analysis.append(f"Planets in the exact same sign in D1 and D9 are tremendously powerful. You have {v_str} as Vargottama. These planets act as unshakeable structural pillars in your life, providing highly consistent positive results regardless of external chaos.")
+    else: analysis.append("Your planetary energies are highly adaptable. You evolve and dynamically change your approach to challenges as you grow older.")
+    
     return analysis
 
 def analyze_career_professional(p_pos, d10_lagna, lagna_rasi, sav_scores, bhava_placements):
@@ -202,11 +213,14 @@ def analyze_career_professional(p_pos, d10_lagna, lagna_rasi, sav_scores, bhava_
     
     if sun_rasi_h != sun_bhava_h:
         analysis.append(f"Crucial Shift: Your Sun is in the {sun_rasi_h}th Sign (Psychology), but effectively works in the {sun_bhava_h}th House (Result).")
-    else: analysis.append(f"Direct Impact: Your Sun aligns perfectly in Sign and House ({sun_rasi_h}th). Your internal intent matches your external career results.")
+        if sun_bhava_h == 10: analysis.append("This is mathematically powerful: Even if the sign itself seems weak, the Sun is functionally delivering Career Authority (10th Bhava).")
+        elif sun_bhava_h == 9: analysis.append("Your ultimate leadership style is less about direct 'Command' (10th) and much more about 'Mentorship & Vision' (9th).")
+        elif sun_bhava_h == 11: analysis.append("Your career focus definitively shifts from pure 'Status' (10th) to maximizing 'Liquid Gains & Networking' (11th).")
+    else: analysis.append(f"Direct Impact: Your Sun aligns perfectly in Sign and House ({sun_rasi_h}th). Your internal intent perfectly matches your external career results.")
 
     analysis.append("#### Mid-Life Strategy (Age 48+)")
-    if sav_scores[9] > 28: analysis.append("Legacy Building: Your Career House is structurally strong. Double down entirely on your established expertise.")
-    else: analysis.append("Strategic Pivot: Your Career House requires support. Rely heavily on the 11th House (Network) or 9th House (Advisory) to maintain your status.")
+    if sav_scores[9] > 28: analysis.append("Legacy Building: Your Career House is structurally strong. The next decade is purely about cementing your reputation. Do not switch fields; double down entirely on your established expertise.")
+    else: analysis.append("Strategic Pivot: Your Career House requires support. Rely heavily on the 11th House (Network) or 9th House (Advisory) to maintain your status. Shift your role from 'Doing' to 'Guiding'.")
 
     analysis.append("#### The CEO Engine (Dasamsa D10)")
     d10_lord = RASI_RULERS[(d10_lagna + 9) % 12 or 12]
@@ -218,7 +232,8 @@ def analyze_career_professional(p_pos, d10_lagna, lagna_rasi, sav_scores, bhava_
     elif d10_lord == "Saturn": role, traits = "Infrastructure, Logistics, Public Admin", "Discipline"
     elif d10_lord == "Sun": role, traits = "Government, CEO, Public Policy", "Governance"
     
-    analysis.append(f"Archetype: {role}. Workplace Application: Your Dasamsa Lord is {d10_lord}. In meetings and decisions, rely on {traits}.")
+    analysis.append(f"Archetype: {role}.")
+    analysis.append(f"Workplace Application: Your Dasamsa (D10) Lord is {d10_lord}. In meetings and decisions, rely on {traits}. This is your unique competitive advantage.")
     return analysis
 
 # --- MODULE: FORECASTING & TRANSITS ---
@@ -234,20 +249,20 @@ def generate_annual_forecast(moon_rasi, sav_scores, f_year, age):
     wealth_score = sav_scores[1]
     fc = {}
     
-    if sat_dist in [3, 6, 11] and career_score > 28: fc['Career'] = ("EXCELLENT GROWTH PHASE (High Impact). Saturn is in a growth house AND your career chart strength is mathematically high. Expect a major promotion.", "Light a lamp with sesame oil on Saturdays.")
-    elif sat_dist in [3, 6, 11]: fc['Career'] = ("POSITIVE GROWTH. You will see solid progress, but it requires more direct effort than usual. Keep pushing.", "Light a lamp with sesame oil.")
-    elif sat_dist in [1, 2, 12]: fc['Career'] = ("SADE SATI PHASE (Caution). You may feel professionally undervalued or stuck. Consolidate internal skills.", "Chant Hanuman Chalisa daily.")
-    else: fc['Career'] = ("STEADY PROGRESS. There are no major highs or lows indicated. This is a highly productive year to clear pending projects.", "Keep your workspace completely decluttered.")
+    if sat_dist in [3, 6, 11] and career_score > 28: fc['Career'] = ("EXCELLENT GROWTH PHASE (High Impact). Saturn is in a growth house AND your career chart strength is mathematically high. Expect a major promotion, structural elevation, or a breakthrough victory over competitors.", "Light a lamp with sesame oil on Saturdays.")
+    elif sat_dist in [3, 6, 11]: fc['Career'] = ("POSITIVE GROWTH. You will see solid progress, but it requires more direct effort than usual because your base career strength is moderate. Keep pushing, and meticulously document your wins.", "Light a lamp with sesame oil.")
+    elif sat_dist in [1, 2, 12]: fc['Career'] = ("SADE SATI PHASE (Caution). You may feel professionally undervalued or stuck. This is a crucial time to consolidate internal skills, not to job-hop recklessly. Avoid ego-clashes.", "Chant Hanuman Chalisa daily.")
+    else: fc['Career'] = ("STEADY PROGRESS. There are no major highs or lows indicated. This is a highly productive year to clear pending projects and rigorously organize your workflow.", "Keep your workspace completely decluttered.")
 
-    if jup_dist in [2, 11] and wealth_score > 30: fc['Wealth'] = ("WEALTH EXPLOSION. Jupiter blesses your income house AND your wealth score is exceptionally high. Investments made during this window will generate massive returns.", "Donate yellow food (bananas/dal) on Thursdays.")
-    elif jup_dist in [2, 11]: fc['Wealth'] = ("HIGH FINANCIAL INFLOW. Jupiter heavily blesses your income house. Favorable time to buy gold or secure land.", "Donate yellow food on Thursdays.")
-    else: fc['Wealth'] = ("STABLE INCOME. Strictly avoid high-risk speculation this year. Focus purely on savings.", "Keep a small turmeric stick in your wallet.")
+    if jup_dist in [2, 11] and wealth_score > 30: fc['Wealth'] = ("WEALTH EXPLOSION. Jupiter blesses your income house AND your wealth score is exceptionally high. Investments made during this window will generate massive, structural returns in the long run.", "Donate yellow food (bananas/dal) on Thursdays.")
+    elif jup_dist in [2, 11]: fc['Wealth'] = ("HIGH FINANCIAL INFLOW. Jupiter heavily blesses your income house. This is a highly favorable time to buy gold or secure land. Your general cash flow will be noticeably smooth.", "Donate yellow food on Thursdays.")
+    else: fc['Wealth'] = ("STABLE INCOME. Strictly avoid high-risk speculation this year. Focus purely on savings rather than spending. Expenses may easily match income if you are not careful.", "Keep a small turmeric stick in your wallet.")
 
-    if sat_dist in [1, 7]: fc['Rel'] = ("TESTING TIME. Saturn may bring coldness or distance in marriage. Deep patience is required.", "Offer white flowers to flowing water on Fridays.")
-    else: fc['Rel'] = ("HARMONIOUS. Excellent structural support from family. A peaceful year for personal life.", "Gift something sweet to your partner.")
+    if sat_dist in [1, 7]: fc['Rel'] = ("TESTING TIME. Saturn may bring coldness or structural distance in marriage. You must communicate with absolute clarity to avoid misunderstandings. Deep patience is required.", "Offer white flowers to flowing water on Fridays.")
+    else: fc['Rel'] = ("HARMONIOUS. You have excellent structural support from family. This is a peaceful year for personal life, ideal for family vacations or deepening existing bonds.", "Gift something sweet to your partner.")
     
-    if age < 25: fc['Focus'] = ("EDUCATION & SKILLS. Focus entirely on acquiring degrees and certifications.", "Worship Saraswati.")
-    elif 25 <= age < 55: fc['Focus'] = ("FAMILY & ASSETS. Focus your energy on building home equity and financial stability.", "Worship Ganesha.")
+    if age < 25: fc['Focus'] = ("EDUCATION & SKILLS. Focus entirely on acquiring degrees and certifications. Your mind is highly receptive.", "Worship Saraswati.")
+    elif 25 <= age < 55: fc['Focus'] = ("FAMILY & ASSETS. Focus your energy on building home equity, financial stability, and providing for dependents.", "Worship Ganesha.")
     else: fc['Focus'] = ("HEALTH & SPIRIT. Focus entirely on preventative physical health and deep spiritual retreats.", "Worship Shiva.")
     return fc
 
@@ -300,32 +315,32 @@ def get_micro_transits(f_year, p_lon_absolute):
         
         meaning = ""
         if trp == "Saturn":
-            if np == "Sun": meaning = "Heavy pressure on career and ego. Yield to authority."
-            elif np == "Moon": meaning = "Peak Sade Sati energy. Emotional weight and forced maturity."
-            elif np == "Mars": meaning = "Extreme frustration or blocked energy. Avoid physical risks."
-            elif np == "Mercury": meaning = "Serious mental focus. Great for heavy analytical work."
-            elif np == "Jupiter": meaning = "A clash between growth and restriction. Solidify finances."
-            elif np == "Venus": meaning = "Relationships face a reality check. Commitment is strictly tested."
-            elif np == "Saturn": meaning = "Saturn Return. A major milestone of rebuilding your life structure."
-            elif np == "Lagna": meaning = "Massive personal restructuring. High physical fatigue."
+            if np == "Sun": meaning = "Heavy pressure on career and ego. Yield to authority or carry heavy professional burdens."
+            elif np == "Moon": meaning = "Peak Sade Sati energy. Emotional weight, reality checks, and forced maturity. Prioritize mental health."
+            elif np == "Mars": meaning = "Extreme frustration or blocked energy. Avoid physical risks, speeding, or aggressive confrontations."
+            elif np == "Mercury": meaning = "Serious mental focus. Great for heavy analytical work, but restrictive for lighthearted communication."
+            elif np == "Jupiter": meaning = "A clash between growth and restriction. Financial structures must be solidified and secured."
+            elif np == "Venus": meaning = "Relationships face a reality check. Frivolous spending is punished; commitment is strictly tested."
+            elif np == "Saturn": meaning = "Saturn Return. A major milestone of completely rebuilding your life structure from the ground up."
+            elif np == "Lagna": meaning = "Massive personal restructuring. High physical fatigue. You are stepping into a higher level of maturity."
         elif trp == "Jupiter":
-            if np == "Sun": meaning = "Massive visibility and career grace. Promotions arise."
-            elif np == "Moon": meaning = "Deep emotional healing. Auspicious events at home."
-            elif np == "Mars": meaning = "A surge of confident energy. Excellent time to launch initiatives."
-            elif np == "Mercury": meaning = "Intellectual breakthroughs. High success in trade and networking."
-            elif np == "Jupiter": meaning = "Jupiter Return. A 12-year peak of luck and financial opportunity."
-            elif np == "Venus": meaning = "High romantic and financial luck. Luxury and ease."
-            elif np == "Saturn": meaning = "Relief from long-standing burdens. Hard work gets rewarded."
-            elif np == "Lagna": meaning = "Physical and spiritual protection. A highly optimistic period."
+            if np == "Sun": meaning = "Massive visibility and career grace. Promotions, favor from bosses, and leadership opportunities arise."
+            elif np == "Moon": meaning = "Deep emotional healing. Auspicious events at home, property gains, or family expansion."
+            elif np == "Mars": meaning = "A surge of confident energy. Excellent time to launch bold initiatives or legal actions."
+            elif np == "Mercury": meaning = "Intellectual breakthroughs. High success in trade, writing, deals, and networking."
+            elif np == "Jupiter": meaning = "Jupiter Return. A 12-year peak of luck, spiritual alignment, and financial opportunity."
+            elif np == "Venus": meaning = "High romantic and financial luck. A period of luxury, celebrations, and ease in relationships."
+            elif np == "Saturn": meaning = "Relief from long-standing burdens. Your hard work finally gets recognized and rewarded."
+            elif np == "Lagna": meaning = "Physical and spiritual protection. A highly optimistic period where your personal aura shines."
         elif trp == "Rahu":
-            if np == "Sun": meaning = "Sudden desire for power. Beware of ego-traps."
-            elif np == "Moon": meaning = "High emotional turbulence. Guard your mental peace carefully."
-            elif np == "Mars": meaning = "Explosive, unpredictable energy. Massive drive, but high risk of accidents."
-            elif np == "Mercury": meaning = "Obsessive thinking. Beware of deceptive communications."
-            elif np == "Jupiter": meaning = "Breaking traditional rules for success. Financial windfalls."
-            elif np == "Venus": meaning = "Intense romantic or financial desires. Sudden infatuations."
-            elif np == "Saturn": meaning = "Karmic acceleration. Breaking old rules to build new structures."
-            elif np == "Lagna": meaning = "A sudden urge to completely reinvent your physical appearance."
+            if np == "Sun": meaning = "Sudden, almost obsessive desire for power. Beware of ego-traps or clashes with male authority."
+            elif np == "Moon": meaning = "High emotional turbulence or anxiety. Unconventional desires. Guard your mental peace carefully."
+            elif np == "Mars": meaning = "Explosive, unpredictable energy. Massive drive, but high risk of accidents or impulsive anger."
+            elif np == "Mercury": meaning = "Obsessive thinking. Good for tech/coding, but beware of deceptive communications or scams."
+            elif np == "Jupiter": meaning = "Breaking traditional rules for success. Financial windfalls through unorthodox means."
+            elif np == "Venus": meaning = "Intense romantic or financial desires. Sudden infatuations or luxurious spending binges."
+            elif np == "Saturn": meaning = "Karmic acceleration. Breaking old rules to build new structures. Stressful but highly productive."
+            elif np == "Lagna": meaning = "A sudden urge to completely reinvent your physical appearance or life path. Restless energy."
         if meaning: events.append({"Trigger": f"Transiting {trp} crosses Natal {np}", "Dates": date_txt, "Impact": meaning})
     return events
 
@@ -338,15 +353,15 @@ def generate_mahadasha_table(moon_lon, birth_date):
     first_end = curr_date + timedelta(days=DASHA_YEARS[first_lord] * bal * 365.25)
     
     preds = {
-        "Ketu": "A period of detachment, introspection, and spiritual growth. You may feel cut off from superficial material ambitions.",
-        "Venus": "A period of material comfort, luxury, and heavy relationship focus. Significant career growth comes through networking or arts.",
-        "Sun": "A period of absolute authority, power, and identity formation. You actively seek recognition and leadership roles.",
-        "Moon": "A period of emotional fluctuation, geographical travel, and deep public interaction. Your internal focus shifts to the home.",
-        "Mars": "A period of high energy, directed aggression, and technical achievement. Excellent for real estate or conquering obstacles.",
-        "Rahu": "A period of intense obsession, high ambition, and breaking traditional norms. Unexpected, sudden rises and falls will occur.",
-        "Jupiter": "A period of deep wisdom, structural expansion, and divine grace. You gain immense respect through knowledge. Wealth accumulates.",
-        "Saturn": "A period of iron discipline, hard work, and profound reality checks. Growth is highly mathematically steady but slow.",
-        "Mercury": "A period of sharp intellect, commerce, and rapid communication. The speed of life increases significantly. Business flourishes."
+        "Ketu": "A period of detachment, introspection, and spiritual growth. You may feel cut off from superficial material ambitions. Sudden breaks in career or relationships are highly possible, engineered specifically to redirect you towards your true path.",
+        "Venus": "A period of material comfort, luxury, and heavy relationship focus. You will actively seek harmony and aesthetic pleasure. Significant career growth comes through networking, arts, or female figures. Marriage or long-term structural partnerships are highlighted.",
+        "Sun": "A period of absolute authority, power, and identity formation. You actively seek recognition and leadership roles. Relations with the father or government entities become highly significant. You will not tolerate subordination.",
+        "Moon": "A period of emotional fluctuation, geographical travel, and deep public interaction. Your internal focus shifts to the home and mother figures. Moods may vary like the tides. You gain significantly through public service, food, or liquid industries.",
+        "Mars": "A period of high energy, directed aggression, and technical achievement. You will aggressively conquer rivals and obstacles. This is an excellent period for engineering, sports, or acquiring real estate. You must actively manage your temper to avoid accidents.",
+        "Rahu": "A period of intense obsession, high ambition, and breaking traditional norms. You crave success at any absolute cost. Unexpected, sudden rises and falls will occur. Foreign travel or dealings with foreign cultures are highly favorable.",
+        "Jupiter": "A period of deep wisdom, structural expansion, and divine grace. You gain immense respect through knowledge, teaching, or consulting. Wealth accumulates organically and steadily. Your family expands. You become highly optimistic and are physically protected.",
+        "Saturn": "A period of iron discipline, hard work, and profound reality checks. Growth is highly mathematically steady but slow. You will face heavy responsibilities. You learn deep patience and endurance. Old, weak structures in your life crumble to force you to build new, permanent ones.",
+        "Mercury": "A period of sharp intellect, commerce, and rapid communication. The speed of life increases significantly. You learn new technical skills rapidly. Business and trade flourish. Nervous energy is high. Short travels are frequent. Meticulous networking brings immediate financial gains."
     }
     
     timeline = [{"Age (From-To)": f"0 - {int((first_end - birth_date).days/365.25)}", "Years": f"{curr_date.year} - {first_end.year}", "Mahadasha": first_lord, "Prediction": preds.get(first_lord, "")}]
@@ -361,19 +376,24 @@ def generate_mahadasha_table(moon_lon, birth_date):
 def get_detailed_bhukti_analysis(md, ad, planet_bhava_map):
     md_house = planet_bhava_map.get(md, 1)
     ad_house = planet_bhava_map.get(ad, 1)
-    topics = {1: "personal identity and vitality", 2: "wealth accumulation", 3: "courage and communication", 4: "domestic peace and real estate", 5: "creativity, children and intellect", 6: "health routines and overcoming competitors", 7: "marriage and partnerships", 8: "deep transformation and sudden events", 9: "luck, higher learning, and mentorship", 10: "career advancement and public status", 11: "network expansion and large gains", 12: "spiritual retreats and foreign connections"}
+    topics = {1: "personal identity, physical vitality, and major life directions", 2: "wealth accumulation, family dynamics, and financial planning", 3: "courage, self-effort, short travels, and communication", 4: "domestic peace, real estate, mother, and inner emotional foundations", 5: "creativity, children, speculative investments, and intellect", 6: "health routines, resolving debts, and overcoming competitors", 7: "marriage, business partnerships, and public dealings", 8: "deep transformation, hidden knowledge, unexpected events, and shared finances", 9: "luck, higher learning, long-distance travel, and mentorship", 10: "career advancement, public status, and professional authority", 11: "network expansion, large gains, and the fulfillment of long-term desires", 12: "spiritual retreats, foreign connections, high expenditures, and letting go"}
     remedy_deity = lifestyle_guidance.get(ad, {}).get("Deity", "your personal deity")
-    
+    remedy_action = lifestyle_guidance.get(ad, {}).get("Action", "charitable acts")
+
     base = f"This phase brings the overarching agenda of {md} (Strategy) into physical reality through the specific execution of {ad} (Tactics).\n\n"
-    if md == ad: base += f"Because {md} is placed in your {md_house}th House, this period is intensely, heavily focused around {topics[md_house]}.\n\n"
-    else: base += f"In your specific chart, {md} sits in the {md_house}th House (long-term focus), while {ad} is currently activating your {ad_house}th House. This means immediate events will manifest specifically through {topics[ad_house]}.\n\n"
+    if md == ad: base += f"Because {md} is placed in your {md_house}th House, this period is intensely, heavily focused. The absolute center of your life right now revolves around {topics[md_house]}. This is a 'Dasha Sandhi' (peak intensification) where the planetary energy is completely undiluted.\n\n"
+    else: base += f"In your specific chart, {md} sits in the {md_house}th House, making your long-term, background focus center on {topics[md_house]}. However, {ad} is currently activating your {ad_house}th House. This means your immediate, day-to-day events, actions, and results will manifest specifically through {topics[ad_house]}.\n\n"
 
     base += "Key Predictions:\n"
-    base += f"- Core focus shifts heavily toward {topics[ad_house]}.\n"
+    base += f"- Core focus shifts heavily toward {topics[ad_house].split(',')[0]}.\n"
+    if ad_house in [6, 8, 12]: base += f"- Since {ad} activates a challenging house ({ad_house}th), expect to navigate necessary, structural obstacles or required personal transformations in this specific area.\n"
+    elif ad_house in [1, 5, 9]: base += f"- With {ad} activating a Dharma (purpose) house, this is a distinct time of high inspiration, organic luck, and deep personal alignment.\n"
+    elif ad_house in [10, 2, 11]: base += f"- With {ad} activating an Artha/Kama (wealth/desire) house, expect highly tangible material or structural professional growth.\n"
+    else: base += f"- A period of building deep internal stability and focusing entirely on the foundations of your physical life.\n"
 
-    if ad in ["Saturn", "Mars", "Rahu", "Ketu", "Sun"]: base += "Precautions: This sub-period is ruled by an intense, aggressive planet. Avoid impulsive decisions and verify all legal documents.\n"
-    else: base += "Precautions: While this is a supportive energy, do not become intellectually or physically complacent.\n"
-    base += f"Actionable Pariharam: Regularly worship or meditate upon {remedy_deity}."
+    if ad in ["Saturn", "Mars", "Rahu", "Ketu", "Sun"]: base += "\nPrecautions: This sub-period is ruled by a naturally intense, aggressive planet. You must actively avoid impulsive decisions, practice extreme patience, and do not force outcomes prematurely. Verify all legal documents carefully.\n"
+    else: base += "\nPrecautions: While this is a generally supportive and gentle energy, do not become intellectually or physically complacent. Avoid over-indulgence and heavily maintain your daily discipline.\n"
+    base += f"\nActionable Pariharam: To optimize this specific {ad} period, focus heavily on {remedy_action.lower()}. Regularly worship or silently meditate upon {remedy_deity}."
     return base
 
 def generate_current_next_bhukti(moon_lon, birth_date, planet_bhava_map):
@@ -416,7 +436,7 @@ def generate_current_next_bhukti(moon_lon, birth_date, planet_bhava_map):
         bal = 1
 
 # ==========================================
-# 4. HTML VISUAL GENERATORS
+# 4. HTML VISUAL GENERATORS (For Streamlit UI)
 # ==========================================
 def get_south_indian_chart_html(p_pos, lagna_rasi, title, lang="English"):
     g = {i: [] for i in range(1, 13)}
@@ -429,7 +449,7 @@ def get_south_indian_chart_html(p_pos, lagna_rasi, title, lang="English"):
     return f"<div style='max-width: 450px; margin: auto; font-family: sans-serif;'><table style='width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; background-color: #ffffff; border: 2px solid #333;'><tr><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[12]} (12)</div>{g[12]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[1]} (1)</div>{g[1]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[2]} (2)</div>{g[2]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[3]} (3)</div>{g[3]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[11]} (11)</div>{g[11]}</td><td colspan='2' rowspan='2' style='border: none; vertical-align: middle; font-weight: bold; font-size: 16px; color:#2c3e50; background-color: #ffffff;'>{title}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[4]} (4)</div>{g[4]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[10]} (10)</div>{g[10]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[5]} (5)</div>{g[5]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[9]} (9)</div>{g[9]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[8]} (8)</div>{g[8]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[7]} (7)</div>{g[7]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[6]} (6)</div>{g[6]}</td></tr></table></div>"
 
 # ==========================================
-# 5. ROBUST HTML EXPORT ENGINE (FLAWLESS BILINGUAL)
+# 5. ROBUST HTML EXPORT ENGINE (FLAWLESS BILINGUAL REPORT)
 # ==========================================
 def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, id_data, lagna_str, moon_str, star_str, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang="English"):
     
@@ -440,7 +460,7 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
             else: out += f"<p>{line}</p>"
         return out
 
-    h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
+    h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Premium Report: {name_in}"
     l_lbl = "லக்னம்" if lang == "Tamil" else "Lagna"
     m_lbl = "ராசி" if lang == "Tamil" else "Moon"
     s_lbl = "நட்சத்திரம்" if lang == "Tamil" else "Star"
@@ -457,7 +477,7 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
         bar_w = int((score / 45) * 100)
         color_class = "high" if score >= 30 else "low" if score < 25 else ""
         lbl = "பாவம்" if lang == "Tamil" else "H"
-        score_html += f"<tr><td width='15%'>{lbl} {house_num}</td><td width='75%'><div class='bar {color_class}' style='width: {bar_w}%;'></div></td><td width='10%'><b>{score}</b></td></tr>"
+        score_html += f"<tr><td width='15%'><b>{lbl} {house_num}</b></td><td width='75%'><div class='bar {color_class}' style='width: {bar_w}%;'></div></td><td width='10%'><b>{score}</b></td></tr>"
     score_html += "</table>"
 
     html = f"""
@@ -467,27 +487,42 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
     <meta charset="utf-8">
     <title>{h_title}</title>
     <style>
-        body {{ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; padding: 40px; max-width: 800px; margin: auto; }}
-        h1 {{ text-align: center; color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }}
-        h2 {{ color: #2980b9; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px; page-break-after: avoid; }}
-        h4 {{ color: #34495e; margin-bottom: 5px; }}
-        p {{ margin-top: 5px; text-align: justify; }}
-        .subtitle {{ text-align: center; font-style: italic; color: #7f8c8d; margin-bottom: 30px; }}
-        .bar-chart {{ width: 100%; border-collapse: collapse; margin-top: 15px; page-break-inside: avoid; }}
-        .bar-chart td {{ padding: 6px 0; vertical-align: middle; }}
-        .bar {{ background-color: #95a5a6; height: 18px; border-radius: 3px; }}
+        body {{ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; padding: 40px; max-width: 900px; margin: auto; }}
+        h1 {{ text-align: center; color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 28px; }}
+        h2 {{ color: #2980b9; margin-top: 40px; border-bottom: 1px solid #eee; padding-bottom: 5px; font-size: 22px; page-break-after: avoid; }}
+        h4 {{ color: #2c3e50; margin-bottom: 5px; font-size: 16px; margin-top: 20px; }}
+        p {{ margin-top: 5px; text-align: justify; font-size: 15px; color: #444; }}
+        .subtitle {{ text-align: center; font-style: italic; color: #7f8c8d; margin-bottom: 40px; font-size: 16px; }}
+        
+        .bar-chart {{ width: 100%; border-collapse: collapse; margin-top: 20px; page-break-inside: avoid; font-size: 15px; }}
+        .bar-chart td {{ padding: 8px 0; vertical-align: middle; border-bottom: 1px dashed #eee; }}
+        .bar {{ background-color: #95a5a6; height: 22px; border-radius: 4px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }}
         .bar.high {{ background-color: #27ae60; }}
         .bar.low {{ background-color: #e74c3c; }}
+        
         .page-break {{ page-break-before: always; margin-top: 40px; }}
-        .footer {{ text-align: center; font-size: 12px; color: #95a5a6; margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; }}
-        table.timeline {{ width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; page-break-inside: avoid; }}
-        table.timeline th, table.timeline td {{ padding: 8px; text-align: left; border-bottom: 1px solid #eee; vertical-align: top; }}
-        table.timeline th {{ background-color: #f8f9fa; font-weight: bold; }}
+        .footer {{ text-align: center; font-size: 13px; color: #95a5a6; margin-top: 60px; border-top: 1px solid #eee; padding-top: 20px; }}
+        
+        table.timeline {{ width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; page-break-inside: auto; }}
+        table.timeline th, table.timeline td {{ padding: 10px; text-align: left; border-bottom: 1px solid #ddd; vertical-align: top; }}
+        table.timeline tr:nth-child(even) {{ background-color: #fcfcfc; }}
+        table.timeline th {{ background-color: #f0f3f4; font-weight: bold; color: #2c3e50; }}
+        
+        .remedy-box {{ background-color: #fdfae6; border-left: 4px solid #f1c40f; padding: 15px; margin-top: 20px; border-radius: 0 4px 4px 0; }}
+        .remedy-box ul {{ margin: 0; padding-left: 20px; font-size: 15px; }}
+        .remedy-box li {{ margin-bottom: 8px; }}
+        
+        @media print {{
+            body {{ padding: 0; max-width: 100%; }}
+            .page-break {{ page-break-before: always; }}
+            * {{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }}
+            h2 {{ margin-top: 20px; }}
+        }}
     </style>
     </head>
     <body>
         <h1>{h_title}</h1>
-        <div class="subtitle">{l_lbl}: {ZODIAC[lagna_rasi]} | {m_lbl}: {ZODIAC[moon_rasi]} | {s_lbl}: {star_str}</div>
+        <div class="subtitle"><b>{l_lbl}:</b> {ZODIAC[lagna_rasi]} &nbsp;|&nbsp; <b>{m_lbl}:</b> {ZODIAC[moon_rasi]} &nbsp;|&nbsp; <b>{s_lbl}:</b> {star_str}</div>
 
         <h2>{"1. சுயவிவரம் (Identity)" if lang == "Tamil" else "1. Identity & Personality"}</h2>
         <p><b>{"நோக்கம்" if lang=="Tamil" else "Purpose"}:</b> {id_data['Purpose']}</p>
@@ -505,10 +540,11 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
 
         <h2>{"4. கல்வி மற்றும் தொழில் (Work & Intellect)" if lang == "Tamil" else "4. Work & Intellect"}</h2>
         {format_section(edu_txt)}
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
         {format_section(career_txt)}
 
         <h2>{"5. திருமணம் (Love & Marriage)" if lang == "Tamil" else "5. Love & Marriage"}</h2>
-        {chart2}
+        <div style="margin-bottom: 20px;">{chart2}</div>
         {format_section(love_txt)}
 
         <h2>{"6. ஆரோக்கியம் (Health & Vitality)" if lang == "Tamil" else "6. Health & Vitality"}</h2>
@@ -516,38 +552,38 @@ def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_tx
 
         <div class="page-break"></div>
 
-        <h2>{"7. யோகங்கள் (Wealth & Power Yogas)" if lang == "Tamil" else "7. Wealth & Power Yogas"}</h2>
+        <h2>{"7. யோகங்கள் (Wealth & Power Combinations)" if lang == "Tamil" else "7. Wealth & Power Yogas"}</h2>
     """
     
     for y in yogas: html += f"<h4>{y['Name']} ({y['Type']})</h4><p>{y['Description']}</p>"
 
     html += f"<h2>{'8. வருடாந்திர கணிப்பு (Annual Forecast)' if lang == 'Tamil' else '8. Annual Forecast'}</h2>"
-    for cat, data in fc.items(): html += f"<h4>{cat}</h4><p>Prediction: {data[0]}<br>Remedy: {data[1]}</p>"
+    for cat, data in fc.items(): html += f"<h4>{cat}</h4><p><b>Prediction:</b> {data[0]}<br><span style='color:#e67e22;'><b>Remedy:</b> {data[1]}</span></p>"
 
     html += f"<h2>{'9. கிரகப் பெயர்ச்சிகள் (Planetary Transits)' if lang == 'Tamil' else '9. Planetary Transits'}</h2>"
     for txt in transit_texts: html += f"<p>{txt.replace(chr(10), '<br>')}</p>"
 
     if micro_transits:
         html += f"<h4>{'Micro-Transits' if lang == 'English' else 'Micro-Transits'}</h4><ul>"
-        for m in micro_transits: html += f"<li><b>{m['Dates']}:</b> {m['Trigger']} - {m['Impact']}</li>"
+        for m in micro_transits: html += f"<li style='margin-bottom: 8px;'><b style='color:#c0392b;'>{m['Dates']}:</b> {m['Trigger']}<br>{m['Impact']}</li>"
         html += "</ul>"
 
     html += f"""
         <div class="page-break"></div>
         <h2>{"10. தசா புக்தி (Strategic Roadmap)" if lang == "Tamil" else "10. Strategic Roadmap"}</h2>
         <table class="timeline">
-            <tr><th>Age</th><th>Years</th><th>Mahadasha</th><th>Prediction</th></tr>
+            <tr><th width="15%">Age</th><th width="15%">Years</th><th width="15%">Mahadasha</th><th width="55%">Prediction</th></tr>
     """
     for row in mahadasha_data:
         html += f"<tr><td>{row['Age (From-To)']}</td><td>{row['Years']}</td><td><b>{row['Mahadasha']}</b></td><td>{row['Prediction']}</td></tr>"
     html += "</table>"
 
     html += f"<h2>{'11. நடப்பு தசா (Phase Drill-Down)' if lang == 'Tamil' else '11. Phase Drill-Down'}</h2>"
-    if pd_info: html += f"<h4>IMMEDIATE FOCUS</h4><p>Active Dates: {pd_info['Start']} to {pd_info['End']}<br>Current Micro-Ruler: {pd_info['PD']} (Operating under {pd_info['MD']} / {pd_info['AD']})</p>"
+    if pd_info: html += f"<h4>IMMEDIATE FOCUS</h4><p><b>Active Dates:</b> {pd_info['Start']} to {pd_info['End']}<br><b>Current Micro-Ruler:</b> {pd_info['PD']} (Operating under {pd_info['MD']} / {pd_info['AD']})</p><hr style='border:0; border-top:1px solid #eee;'>"
     for p in phases: html += f"<h4>{p['Type']}: {p['Phase']} ({p['Dates']})</h4><p>{p['Text'].replace(chr(10), '<br>')}</p>"
 
     html += f"<h2>{'12. பரிகாரங்கள் (Lucky Lifestyle)' if lang == 'Tamil' else '12. Lucky Lifestyle'}</h2>"
-    html += f"<ul><li><b>Deity:</b> {guide.get('Deity', '')}</li><li><b>Mantra:</b> {guide.get('Mantra', '')}</li><li><b>Daily Habit:</b> {guide.get('Daily', '')}</li><li><b>Benefit:</b> {guide.get('Benefit', '')}</li><li><b>Accessories:</b> {guide.get('Accessory', '')}</li><li><b>Avoid:</b> {guide.get('Avoid', '')}</li></ul>"
+    html += f"<div class='remedy-box'><ul><li><b>Deity:</b> {guide.get('Deity', '')}</li><li><b>Mantra:</b> {guide.get('Mantra', '')}</li><li><b>Daily Habit:</b> {guide.get('Daily', '')}</li><li><b>Benefit:</b> {guide.get('Benefit', '')}</li><li><b>Accessories:</b> {guide.get('Accessory', '')}</li><li><b>Avoid:</b> {guide.get('Avoid', '')}</li></ul></div>"
 
     html += f"<div class='footer'>{'வேத ஜோதிட என்ஜின் மூலம் உருவாக்கப்பட்டது' if lang == 'Tamil' else 'Generated by Vedic Astro Engine (Platinum Edition)'}</div>"
     html += "</body></html>"
@@ -654,10 +690,8 @@ if st.session_state.report_generated:
         st.markdown(f"> Lagna: **{ZODIAC[lagna_rasi]}** | Moon: **{ZODIAC[moon_rasi]}** | Star: **{nak}**")
     with c_right:
         eng_id_data = identity_db.get(ZODIAC[lagna_rasi], identity_db["Mesha"])
-        
-        # --- NEW FLAWLESS HTML REPORT GENERATOR ---
         html_bytes = generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, eng_id_data, ZODIAC[lagna_rasi], ZODIAC[moon_rasi], nak, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang=LANG)
-        st.download_button(label="📄 Download Full Report", data=html_bytes, file_name=f"{name_in}_Astro_Report.html", mime="text/html")
+        st.download_button(label="📄 Download Full HTML Report", data=html_bytes, file_name=f"{name_in}_Astro_Report.html", mime="text/html")
 
     db_id = TAMIL_IDENTITY_DB if LANG == "Tamil" else identity_db
     db_lev = TAMIL_LEVERAGE_GUIDE if LANG == "Tamil" else house_leverage_guide
@@ -825,8 +859,6 @@ if st.session_state.report_generated:
                                 
                                 sys_lang = "natural, poetic, and traditional Tamil script (like a wise Nadi astrologer)" if LANG == "Tamil" else "English"
                                 persona = "You are a wise, highly accurate, and compassionate Vedic Astrologer. "
-                                
-                                # UPGRADED RULE TO FORCE THE AI TO SPEAK TAMIL
                                 rules = f"Answer the user's question practically in 3 to 4 sentences based on the data. CRITICAL: You are fully bilingual. If the user asks for Tamil, or if the interface language is set to Tamil, you MUST output your ENTIRE response in Tamil script. Never apologize or say you can only speak English. Default Language for this response: {sys_lang}. Always conclude with a practical remedy."
                                 
                                 conversation_history = "Chat History:\n"
