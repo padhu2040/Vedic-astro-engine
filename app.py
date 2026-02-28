@@ -540,15 +540,13 @@ def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt
     try:
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
-        
-        font_family = 'Arial'
+font_family = 'Arial'
         if lang == "Tamil":
-            if os.path.exists("NotoSansTamil.ttf"):
-                pdf.add_font("NotoTamil", "", "NotoSansTamil.ttf")
+            if os.path.exists("NotoSansTamil-Regular.ttf"):
+                pdf.add_font("NotoTamil", "", "NotoSansTamil-Regular.ttf")
                 font_family = 'NotoTamil'
             else:
-                return b"PDF Error: Missing NotoSansTamil.ttf font file in the folder! Please download it and place it next to app.py."
-                
+                return b"PDF Error: Missing NotoSansTamil-Regular.ttf font file in the folder! Please verify the name in GitHub."              
         pdf.add_page()
         
         h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
