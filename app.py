@@ -5,9 +5,7 @@ import plotly.graph_objects as go
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 import pytz
-from fpdf import FPDF
 import google.generativeai as genai
-import os
 
 # Securely fetch API key from Streamlit Cloud Secrets, or fallback to local config
 try:
@@ -431,340 +429,137 @@ def get_south_indian_chart_html(p_pos, lagna_rasi, title, lang="English"):
     return f"<div style='max-width: 450px; margin: auto; font-family: sans-serif;'><table style='width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; background-color: #ffffff; border: 2px solid #333;'><tr><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[12]} (12)</div>{g[12]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[1]} (1)</div>{g[1]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[2]} (2)</div>{g[2]}</td><td style='border: 1px solid #333; width: 25%; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[3]} (3)</div>{g[3]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[11]} (11)</div>{g[11]}</td><td colspan='2' rowspan='2' style='border: none; vertical-align: middle; font-weight: bold; font-size: 16px; color:#2c3e50; background-color: #ffffff;'>{title}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[4]} (4)</div>{g[4]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[10]} (10)</div>{g[10]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[5]} (5)</div>{g[5]}</td></tr><tr><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[9]} (9)</div>{g[9]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[8]} (8)</div>{g[8]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[7]} (7)</div>{g[7]}</td><td style='border: 1px solid #333; height: 95px; vertical-align: top; padding: 5px; background-color:#fafafa;'><div style='font-size:11px; color:#7f8c8d; text-align:left;'>{z[6]} (6)</div>{g[6]}</td></tr></table></div>"
 
 # ==========================================
-# 5. ROBUST BILINGUAL PDF EXPORT
+# 5. ROBUST HTML EXPORT ENGINE (FLAWLESS BILINGUAL)
 # ==========================================
-def sanitize_text(text):
-    if not isinstance(text, str): return str(text)
-    return text.replace('—', '-').replace('–', '-').replace('’', "'").replace('‘', "'")
+def generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, id_data, lagna_str, moon_str, star_str, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang="English"):
+    
+    def format_section(text_list):
+        out = ""
+        for line in text_list:
+            if line.startswith("#### "): out += f"<h4>{line.replace('#### ', '')}</h4>"
+            else: out += f"<p>{line}</p>"
+        return out
 
-def write_pdf_section(pdf, text_list, lang="English"):
-    font_family = 'NotoTamil' if lang == "Tamil" else 'Arial'
-    for line in text_list:
-        clean = sanitize_text(line)
-        if clean.startswith("#### "):
-            pdf.ln(3)
-            if lang == "Tamil":
-                pdf.set_font(font_family, '', 12)
-            else:
-                pdf.set_font("Arial", 'B', 12)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 8, clean.replace("#### ", ""), ln=1)
-        else:
-            pdf.set_font(font_family, '', 11)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 6, clean)
-            pdf.ln(2)
+    h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
+    l_lbl = "லக்னம்" if lang == "Tamil" else "Lagna"
+    m_lbl = "ராசி" if lang == "Tamil" else "Moon"
+    s_lbl = "நட்சத்திரம்" if lang == "Tamil" else "Star"
 
-def draw_pdf_south_indian_chart(pdf, p_pos, lagna_rasi, title, lang="English"):
-    box_map = {12: (0,0), 1: (1,0), 2: (2,0), 3: (3,0), 11: (0,1), 4: (3,1), 10: (0,2), 5: (3,2), 9: (0,3), 8: (1,3), 7: (2,3), 6: (3,3)}
-    r_names = {1: "Mesha", 2: "Rishabha", 3: "Mithuna", 4: "Kataka", 5: "Simha", 6: "Kanya", 7: "Thula", 8: "Vrischika", 9: "Dhanu", 10: "Makara", 11: "Kumbha", 12: "Meena"}
-    abbr_dict = {"Sun": "Su", "Moon": "Mo", "Mars": "Ma", "Mercury": "Me", "Jupiter": "Ju", "Venus": "Ve", "Saturn": "Sa", "Rahu": "Ra", "Ketu": "Ke"}
-    font_family = 'NotoTamil' if lang == "Tamil" else 'Arial'
-    
-    grid = {i: [] for i in range(1, 13)}
-    grid[lagna_rasi].append("Asc")
-    for p, r in p_pos.items():
-        if p in abbr_dict: 
-            grid[r].append(TAMIL_NAMES.get(p, p) if lang == "Tamil" else abbr_dict[p])
-    
-    if pdf.get_y() > 150: pdf.add_page()
-    start_x, start_y, box_size = (210 - 120) / 2, pdf.get_y() + 5, 30
-    
-    pdf.set_fill_color(248, 248, 248)
-    pdf.set_draw_color(100, 100, 100)
-    
-    for rasi, (col, row) in box_map.items():
-        x, y = start_x + (col * box_size), start_y + (row * box_size)
-        pdf.rect(x, y, box_size, box_size, style='D')
-        
-        pdf.set_font(font_family, '', 8)
-        pdf.set_text_color(120, 120, 120)
-        pdf.text(x + 2, y + 4, r_names[rasi])
-        
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 9)
-        else:
-            pdf.set_font("Arial", 'B', 9)
-        
-        pdf.set_text_color(30, 30, 30)
-        planets = grid[rasi]
-        if planets:
-            pdf.set_xy(x, y + 6)
-            pdf.multi_cell(box_size, 4, "\n".join(planets), align='C')
-    
-    if lang == "Tamil":
-        pdf.set_font(font_family, '', 12)
-    else:
-        pdf.set_font("Arial", 'B', 12)
-        
-    pdf.set_text_color(50, 50, 50)
-    pdf.set_xy(start_x + box_size, start_y + box_size)
-    pdf.multi_cell(box_size * 2, box_size * 2, title, align='C')
-    pdf.set_y(start_y + (box_size * 4) + 15)
+    chart1 = get_south_indian_chart_html(p_pos, lagna_rasi, "ராசி சக்கரம்" if lang == "Tamil" else "Rasi Chart", lang)
+    d9_lagna_idx = get_navamsa_chart(p_pos.get("Lagna", lagna_rasi*30))
+    chart2 = get_south_indian_chart_html(p_d9, d9_lagna_idx, "நவாம்சம்" if lang == "Tamil" else "Navamsa", lang)
 
-def draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang="English"):
-    if pdf.get_y() > 180: pdf.add_page()
-    font_family = 'NotoTamil' if lang == "Tamil" else 'Arial'
-    
-    if lang == "Tamil":
-        pdf.set_font(font_family, '', 11)
-    else:
-        pdf.set_font("Arial", 'B', 11)
-        
-    start_x, start_y = 25, pdf.get_y() + 5
+    score_html = "<table class='bar-chart'>"
     lagna_idx = list(ZODIAC).index(lagna_str)
-    
-    pdf.set_draw_color(255, 255, 255)
     for i in range(12):
         house_num = i + 1
         score = sav_scores[(lagna_idx - 1 + i) % 12]
-        
-        pdf.set_xy(start_x, start_y + (i * 7))
-        pdf.set_text_color(80, 80, 80)
-        pdf.set_font(font_family, '', 10)
-        label = "பாவம்" if lang == "Tamil" else "H"
-        pdf.cell(35, 6, f"{label} {house_num}", ln=0)
-        
-        bar_width = (score / 45) * 100
-        pdf.set_fill_color(200, 200, 200)
-        pdf.rect(start_x + 35, start_y + (i * 7) + 1, bar_width, 4, style='F')
-        
-        if score >= 30: pdf.set_text_color(39, 174, 96)
-        elif score < 25: pdf.set_text_color(231, 76, 60)
-        else: pdf.set_text_color(50, 50, 50)
-        
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 10)
-        else:
-            pdf.set_font("Arial", 'B', 10)
-            
-        pdf.set_xy(start_x + 35 + bar_width + 2, start_y + (i * 7))
-        pdf.cell(10, 6, str(score), ln=0)
-        
-    pdf.set_y(start_y + (12 * 7) + 15)
+        bar_w = int((score / 45) * 100)
+        color_class = "high" if score >= 30 else "low" if score < 25 else ""
+        lbl = "பாவம்" if lang == "Tamil" else "H"
+        score_html += f"<tr><td width='15%'>{lbl} {house_num}</td><td width='75%'><div class='bar {color_class}' style='width: {bar_w}%;'></div></td><td width='10%'><b>{score}</b></td></tr>"
+    score_html += "</table>"
 
-def generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, id_data, lagna_str, moon_str, star_str, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang="English"):
-    try:
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        
-        font_family = 'Arial'
-        
-        # WE ONLY TURN ON TEXT SHAPING FOR TAMIL TO PREVENT ARIAL CRASHES!
-        if lang == "Tamil":
-            if os.path.exists("NotoSansTamil-Regular.ttf"):
-                pdf.add_font("NotoTamil", "", "NotoSansTamil-Regular.ttf")
-                font_family = 'NotoTamil'
-                pdf.text_shaping = True  
-            else:
-                return b"PDF Error: Missing NotoSansTamil-Regular.ttf font file in the folder! Please verify the name in GitHub."
-                
-        pdf.add_page()
-        
-        h_title = f"ஜோதிட அறிக்கை: {name_in}" if lang == "Tamil" else f"Vedic Astrology Report: {name_in}"
-        h_id = "1. சுயவிவரம் (Identity)" if lang == "Tamil" else "1. Identity & Personality"
-        h_rasi = "2. ராசி சக்கரம் (Rasi Chakra)" if lang == "Tamil" else "2. Birth Chart (Rasi Chakra)"
-        h_score = "3. அஷ்டகவர்க்கம் (Destiny Radar)" if lang == "Tamil" else "3. Destiny Radar (Scorecard)"
-        h_work = "4. கல்வி மற்றும் தொழில் (Work & Intellect)" if lang == "Tamil" else "4. Work & Intellect (Education & Career)"
-        h_love = "5. திருமணம் (Love & Marriage)" if lang == "Tamil" else "5. Love & Marriage (Navamsa Engine)"
-        h_health = "6. ஆரோக்கியம் (Health & Vitality)" if lang == "Tamil" else "6. Health & Vitality"
-        h_yogas = "7. யோகங்கள் (Wealth & Power Yogas)" if lang == "Tamil" else "7. Wealth & Power Yogas"
-        h_fc = "8. வருடாந்திர கணிப்பு (Annual Forecast)" if lang == "Tamil" else "8. Annual Forecast"
-        h_transit = "9. கிரகப் பெயர்ச்சிகள் (Planetary Transits)" if lang == "Tamil" else "9. Planetary Transits"
-        h_roadmap = "10. தசா புக்தி (Strategic Roadmap)" if lang == "Tamil" else "10. Strategic Roadmap (Life Chapters)"
-        h_micro = "11. நடப்பு தசா (Phase Drill-Down)" if lang == "Tamil" else "11. Phase Drill-Down & Micro-Timing"
-        h_remedy = "12. பரிகாரங்கள் (Lucky Lifestyle)" if lang == "Tamil" else "12. Lucky Lifestyle"
-        
-        if lang == "Tamil": pdf.set_font(font_family, '', 16)
-        else: pdf.set_font("Arial", 'B', 16)
-        pdf.cell(0, 10, sanitize_text(h_title), ln=1, align='C')
-        
-        if lang == "Tamil": pdf.set_font(font_family, '', 12)
-        else: pdf.set_font("Arial", 'I', 12)
-        
-        l_txt, m_txt = ZODIAC[lagna_rasi], ZODIAC[moon_rasi]
-        if lang == "Tamil": pdf.cell(0, 10, sanitize_text(f"லக்னம்: {l_txt} | ராசி: {m_txt} | நட்சத்திரம்: {star_str}"), ln=1, align='C')
-        else: pdf.cell(0, 10, sanitize_text(f"Lagna: {lagna_str} | Moon: {moon_str} | Star: {star_str}"), ln=1, align='C')
-            
-        pdf.line(10, 30, 200, 30)
-        pdf.ln(10)
-        
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_id), ln=1)
-        if lang == "Tamil": write_pdf_section(pdf, [f"நோக்கம்: {id_data['Purpose']}", f"குணம்: {id_data['Personality']}", f"பலங்கள்: {id_data['Strengths']}", f"பலவீனங்கள்: {id_data['Weaknesses']}"], lang)
-        else: write_pdf_section(pdf, [f"Life Purpose: {id_data['Purpose']}", f"Core Trait: {id_data['Personality']}", f"Strengths: {id_data['Strengths']}", f"Weaknesses: {id_data['Weaknesses']}"], lang)
-        
-        pdf.ln(5)
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_rasi), ln=1)
-        draw_pdf_south_indian_chart(pdf, p_pos, lagna_rasi, h_rasi.split(' ')[1] if lang=="Tamil" else "Rasi Chart", lang)
-        
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_score), ln=1)
-        draw_pdf_bar_chart(pdf, sav_scores, lagna_str, lang)
-        
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_work), ln=1)
-        write_pdf_section(pdf, edu_txt, lang)
-        write_pdf_section(pdf, career_txt, lang)
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <title>{h_title}</title>
+    <style>
+        body {{ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; padding: 40px; max-width: 800px; margin: auto; }}
+        h1 {{ text-align: center; color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }}
+        h2 {{ color: #2980b9; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px; page-break-after: avoid; }}
+        h4 {{ color: #34495e; margin-bottom: 5px; }}
+        p {{ margin-top: 5px; text-align: justify; }}
+        .subtitle {{ text-align: center; font-style: italic; color: #7f8c8d; margin-bottom: 30px; }}
+        .bar-chart {{ width: 100%; border-collapse: collapse; margin-top: 15px; page-break-inside: avoid; }}
+        .bar-chart td {{ padding: 6px 0; vertical-align: middle; }}
+        .bar {{ background-color: #95a5a6; height: 18px; border-radius: 3px; }}
+        .bar.high {{ background-color: #27ae60; }}
+        .bar.low {{ background-color: #e74c3c; }}
+        .page-break {{ page-break-before: always; margin-top: 40px; }}
+        .footer {{ text-align: center; font-size: 12px; color: #95a5a6; margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; }}
+        table.timeline {{ width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; page-break-inside: avoid; }}
+        table.timeline th, table.timeline td {{ padding: 8px; text-align: left; border-bottom: 1px solid #eee; vertical-align: top; }}
+        table.timeline th {{ background-color: #f8f9fa; font-weight: bold; }}
+    </style>
+    </head>
+    <body>
+        <h1>{h_title}</h1>
+        <div class="subtitle">{l_lbl}: {ZODIAC[lagna_rasi]} | {m_lbl}: {ZODIAC[moon_rasi]} | {s_lbl}: {star_str}</div>
 
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_love), ln=1)
-        d9_lagna_idx = get_navamsa_chart(p_pos.get("Lagna", lagna_rasi*30))
-        draw_pdf_south_indian_chart(pdf, p_d9, d9_lagna_idx, "Navamsa", lang)
-        write_pdf_section(pdf, love_txt, lang)
-        
-        pdf.ln(8)
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_health), ln=1)
-        write_pdf_section(pdf, health_txt, lang)
+        <h2>{"1. சுயவிவரம் (Identity)" if lang == "Tamil" else "1. Identity & Personality"}</h2>
+        <p><b>{"நோக்கம்" if lang=="Tamil" else "Purpose"}:</b> {id_data['Purpose']}</p>
+        <p><b>{"குணம்" if lang=="Tamil" else "Personality"}:</b> {id_data['Personality']}</p>
+        <p><b>{"பலங்கள்" if lang=="Tamil" else "Strengths"}:</b> {id_data['Strengths']}</p>
+        <p><b>{"பலவீனங்கள்" if lang=="Tamil" else "Weaknesses"}:</b> {id_data['Weaknesses']}</p>
 
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_yogas), ln=1)
-        for y in yogas:
-            if lang == "Tamil": pdf.set_font(font_family, '', 12)
-            else: pdf.set_font("Arial", 'B', 12)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 8, sanitize_text(f"{y['Name']} ({y['Type']})"), ln=1)
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", '', 11)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 6, sanitize_text(y['Description']))
-            pdf.ln(4)
-            
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_fc), ln=1)
-        for cat, data in fc.items():
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", 'B', 11)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 6, sanitize_text(f"{cat}:"), ln=1)
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", '', 11)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 6, sanitize_text(f"Prediction: {data[0]}\nRemedy: {data[1]}"))
-            pdf.ln(4)
-            
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_transit), ln=1)
-        for txt in transit_texts:
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", '', 11)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 6, sanitize_text(txt))
-            pdf.ln(4)
-        
-        if micro_transits:
-            pdf.ln(5)
-            if lang == "Tamil": pdf.set_font(font_family, '', 14)
-            else: pdf.set_font("Arial", 'B', 14)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 8, sanitize_text("Micro-Transits"), ln=1)
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", '', 11)
-            pdf.set_text_color(40, 40, 40)
-            for m in micro_transits: 
-                pdf.multi_cell(0, 6, sanitize_text(f"- {m['Dates']}: {m['Trigger']}. {m['Impact']}"))
-                pdf.ln(2)
+        <h2>{"2. ராசி சக்கரம் (Rasi Chakra)" if lang == "Tamil" else "2. Birth Chart (Rasi Chakra)"}</h2>
+        {chart1}
 
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_roadmap), ln=1)
-        for row in mahadasha_data:
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", 'B', 11)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 8, sanitize_text(f"Age {row['Age (From-To)']} | {row['Mahadasha']} Dasha ({row['Years']})"), ln=1)
-            if lang == "Tamil": pdf.set_font(font_family, '', 10)
-            else: pdf.set_font("Arial", '', 10)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 5, sanitize_text(row['Prediction']))
-            pdf.ln(3)
+        <h2>{"3. அஷ்டகவர்க்கம் (Destiny Radar)" if lang == "Tamil" else "3. Destiny Radar (Scorecard)"}</h2>
+        {score_html}
 
-        pdf.add_page()
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_micro), ln=1)
-        if pd_info:
-            if lang == "Tamil": pdf.set_font(font_family, '', 12)
-            else: pdf.set_font("Arial", 'B', 12)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 8, sanitize_text("IMMEDIATE FOCUS"), ln=1)
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", '', 11)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 6, sanitize_text(f"Active Dates: {pd_info['Start']} to {pd_info['End']}\nCurrent Micro-Ruler: {pd_info['PD']} (Operating under {pd_info['MD']} / {pd_info['AD']})"))
-            pdf.ln(4)
+        <div class="page-break"></div>
 
-        for p in phases:
-            if lang == "Tamil": pdf.set_font(font_family, '', 12)
-            else: pdf.set_font("Arial", 'B', 12)
-            pdf.set_text_color(0, 0, 0)
-            pdf.cell(0, 8, sanitize_text(f"{p['Type']}: {p['Phase']} ({p['Dates']})"), ln=1)
-            if lang == "Tamil": pdf.set_font(font_family, '', 11)
-            else: pdf.set_font("Arial", '', 11)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 6, sanitize_text(p['Text']))
-            pdf.ln(4)
-            
-        if lang == "Tamil": pdf.set_font(font_family, '', 14)
-        else: pdf.set_font("Arial", 'B', 14)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 10, sanitize_text(h_remedy), ln=1)
-        if lang == "Tamil": pdf.set_font(font_family, '', 11)
-        else: pdf.set_font("Arial", '', 11)
-        pdf.set_text_color(40, 40, 40)
-        pdf.multi_cell(0, 6, sanitize_text(f"Key Deity: {guide.get('Deity', '')}\nMantra: {guide.get('Mantra', '')}\nDaily Habit: {guide.get('Daily', '')}\nBenefit: {guide.get('Benefit', '')}\nAccessories: {guide.get('Accessory', '')}\nAvoid: {guide.get('Avoid', '')}"))
-        
-        pdf.ln(10)
-        if lang == "Tamil":
-            pdf.set_font(font_family, '', 10)
-            footer = "வேத ஜோதிட என்ஜின் மூலம் உருவாக்கப்பட்டது"
-        else:
-            pdf.set_font("Arial", 'I', 10)
-            footer = "Generated by Vedic Astro Engine (Platinum Edition)"
-            
-        pdf.cell(0, 10, txt=sanitize_text(footer), align='C', ln=1)
-        
-        out = pdf.output()
-        return bytes(out)
-    except Exception as e:
-        return f"PDF Error: {str(e)}".encode('utf-8')
+        <h2>{"4. கல்வி மற்றும் தொழில் (Work & Intellect)" if lang == "Tamil" else "4. Work & Intellect"}</h2>
+        {format_section(edu_txt)}
+        {format_section(career_txt)}
+
+        <h2>{"5. திருமணம் (Love & Marriage)" if lang == "Tamil" else "5. Love & Marriage"}</h2>
+        {chart2}
+        {format_section(love_txt)}
+
+        <h2>{"6. ஆரோக்கியம் (Health & Vitality)" if lang == "Tamil" else "6. Health & Vitality"}</h2>
+        {format_section(health_txt)}
+
+        <div class="page-break"></div>
+
+        <h2>{"7. யோகங்கள் (Wealth & Power Yogas)" if lang == "Tamil" else "7. Wealth & Power Yogas"}</h2>
+    """
+    
+    for y in yogas: html += f"<h4>{y['Name']} ({y['Type']})</h4><p>{y['Description']}</p>"
+
+    html += f"<h2>{'8. வருடாந்திர கணிப்பு (Annual Forecast)' if lang == 'Tamil' else '8. Annual Forecast'}</h2>"
+    for cat, data in fc.items(): html += f"<h4>{cat}</h4><p>Prediction: {data[0]}<br>Remedy: {data[1]}</p>"
+
+    html += f"<h2>{'9. கிரகப் பெயர்ச்சிகள் (Planetary Transits)' if lang == 'Tamil' else '9. Planetary Transits'}</h2>"
+    for txt in transit_texts: html += f"<p>{txt.replace(chr(10), '<br>')}</p>"
+
+    if micro_transits:
+        html += f"<h4>{'Micro-Transits' if lang == 'English' else 'Micro-Transits'}</h4><ul>"
+        for m in micro_transits: html += f"<li><b>{m['Dates']}:</b> {m['Trigger']} - {m['Impact']}</li>"
+        html += "</ul>"
+
+    html += f"""
+        <div class="page-break"></div>
+        <h2>{"10. தசா புக்தி (Strategic Roadmap)" if lang == "Tamil" else "10. Strategic Roadmap"}</h2>
+        <table class="timeline">
+            <tr><th>Age</th><th>Years</th><th>Mahadasha</th><th>Prediction</th></tr>
+    """
+    for row in mahadasha_data:
+        html += f"<tr><td>{row['Age (From-To)']}</td><td>{row['Years']}</td><td><b>{row['Mahadasha']}</b></td><td>{row['Prediction']}</td></tr>"
+    html += "</table>"
+
+    html += f"<h2>{'11. நடப்பு தசா (Phase Drill-Down)' if lang == 'Tamil' else '11. Phase Drill-Down'}</h2>"
+    if pd_info: html += f"<h4>IMMEDIATE FOCUS</h4><p>Active Dates: {pd_info['Start']} to {pd_info['End']}<br>Current Micro-Ruler: {pd_info['PD']} (Operating under {pd_info['MD']} / {pd_info['AD']})</p>"
+    for p in phases: html += f"<h4>{p['Type']}: {p['Phase']} ({p['Dates']})</h4><p>{p['Text'].replace(chr(10), '<br>')}</p>"
+
+    html += f"<h2>{'12. பரிகாரங்கள் (Lucky Lifestyle)' if lang == 'Tamil' else '12. Lucky Lifestyle'}</h2>"
+    html += f"<ul><li><b>Deity:</b> {guide.get('Deity', '')}</li><li><b>Mantra:</b> {guide.get('Mantra', '')}</li><li><b>Daily Habit:</b> {guide.get('Daily', '')}</li><li><b>Benefit:</b> {guide.get('Benefit', '')}</li><li><b>Accessories:</b> {guide.get('Accessory', '')}</li><li><b>Avoid:</b> {guide.get('Avoid', '')}</li></ul>"
+
+    html += f"<div class='footer'>{'வேத ஜோதிட என்ஜின் மூலம் உருவாக்கப்பட்டது' if lang == 'Tamil' else 'Generated by Vedic Astro Engine (Platinum Edition)'}</div>"
+    html += "</body></html>"
+    
+    return html.encode('utf-8')
 
 # ==========================================
 # 6. STREAMLIT APP UI & EXECUTION
 # ==========================================
 
-if 'report_generated' not in st.session_state:
-    st.session_state.report_generated = False
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
+if 'report_generated' not in st.session_state: st.session_state.report_generated = False
+if 'messages' not in st.session_state: st.session_state.messages = []
 
 with st.sidebar:
     LANG = st.radio("Language / மொழி", ["English", "Tamil"])
@@ -836,13 +631,11 @@ if st.session_state.report_generated:
     bhava_placements["Ketu"] = ketu_bhava_h 
     sav_scores = calculate_sav_score(p_pos, lagna_rasi)
     nak, lord = get_nakshatra_details(moon_res[0])
-    
     yogas = scan_yogas(p_pos, lagna_rasi)
     career_txt = analyze_career_professional(p_pos, d10_lagna, lagna_rasi, sav_scores, bhava_placements)
     edu_txt = analyze_education(p_pos, lagna_rasi)
     health_txt = analyze_health(p_pos, lagna_rasi)
     love_txt = analyze_love_marriage(lagna_rasi, d9_lagna, p_d9, p_pos)
-    
     fc = generate_annual_forecast(moon_rasi, sav_scores, f_year, current_age)
     t_data = get_transit_data_advanced(f_year)
     sat_h = (t_data['Saturn']['Rasi'] - moon_rasi + 1) if (t_data['Saturn']['Rasi'] - moon_rasi + 1) > 0 else (t_data['Saturn']['Rasi'] - moon_rasi + 1) + 12
@@ -850,7 +643,6 @@ if st.session_state.report_generated:
     jup_txt = f"Moving From: {ZODIAC[t_data['Jupiter']['Rasi']]} to {t_data['Jupiter']['NextSign']} on {t_data['Jupiter']['NextDate']}\nPsychology: Optimism returns. You feel supported by invisible hands.\nOutcome: Growth in wealth and wisdom."
     rahu_txt = f"Current Axis: Rahu in {ZODIAC[t_data['Rahu']['Rasi']]} / Ketu in {ZODIAC[(t_data['Rahu']['Rasi']+6-1)%12+1]}\nPsychology: Rahu creates obsession where it sits, while Ketu creates detachment."
     transit_texts = [sat_txt, jup_txt, rahu_txt]
-    
     micro_transits = get_micro_transits(f_year, p_lon_absolute)
     mahadasha_data = generate_mahadasha_table(moon_res[0], datetime.combine(dob_in, tob_in))
     phases, pd_info = generate_current_next_bhukti(moon_res[0], datetime.combine(dob_in, tob_in), bhava_placements)
@@ -863,12 +655,9 @@ if st.session_state.report_generated:
     with c_right:
         eng_id_data = identity_db.get(ZODIAC[lagna_rasi], identity_db["Mesha"])
         
-        pdf_bytes = generate_pdf_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, eng_id_data, ZODIAC[lagna_rasi], ZODIAC[moon_rasi], nak, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang=LANG)
-        
-        if pdf_bytes.startswith(b"PDF Error:"):
-            st.error(pdf_bytes.decode('utf-8'))
-        else:
-            st.download_button(label="📄 Download PDF Report", data=pdf_bytes, file_name=f"{name_in}_Astro_Report.pdf", mime="application/pdf")
+        # --- NEW FLAWLESS HTML REPORT GENERATOR ---
+        html_bytes = generate_html_report(name_in, p_pos, p_d9, lagna_rasi, sav_scores, career_txt, edu_txt, health_txt, love_txt, eng_id_data, ZODIAC[lagna_rasi], ZODIAC[moon_rasi], nak, yogas, fc, micro_transits, mahadasha_data, phases, pd_info, guide, transit_texts, lang=LANG)
+        st.download_button(label="📄 Download Full Report", data=html_bytes, file_name=f"{name_in}_Astro_Report.html", mime="text/html")
 
     db_id = TAMIL_IDENTITY_DB if LANG == "Tamil" else identity_db
     db_lev = TAMIL_LEVERAGE_GUIDE if LANG == "Tamil" else house_leverage_guide
@@ -883,17 +672,11 @@ if st.session_state.report_generated:
         st.markdown(f"**Purpose:** {user_id['Purpose']}")
         st.markdown(f"**Personality:** {user_id['Personality']}")
         c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("#### Strengths")
-            st.markdown(user_id['Strengths'])
-        with c2:
-            st.markdown("#### Weaknesses")
-            st.markdown(user_id['Weaknesses'])
-        
+        with c1: st.markdown("#### Strengths"); st.markdown(user_id['Strengths'])
+        with c2: st.markdown("#### Weaknesses"); st.markdown(user_id['Weaknesses'])
         st.divider()
         st.markdown("<h3 style='text-align: center;'>Birth Chart (Rasi Chakra)</h3>", unsafe_allow_html=True)
         st.markdown(get_south_indian_chart_html(p_pos, lagna_rasi, "Birth Chart (Rasi)", LANG), unsafe_allow_html=True)
-        
         st.markdown("<h4 style='text-align: center; margin-top: 30px;'>Planetary Details</h4>", unsafe_allow_html=True)
         table_md = "<table style='width: 80%; margin: 20px auto; border-collapse: collapse; font-family: sans-serif; font-size: 15px; text-align: center;'><tr style='background-color: #f8f9fa; border-bottom: 2px solid #ccc;'><th style='padding: 12px 8px;'>Planet</th><th style='padding: 12px 8px;'>Rasi</th><th style='padding: 12px 8px;'>House</th><th style='padding: 12px 8px;'>Bhava</th><th style='padding: 12px 8px;'>Dignity</th><th style='padding: 12px 8px;'>Status</th></tr>"
         for row in master_table:
@@ -907,25 +690,18 @@ if st.session_state.report_generated:
         cats_labels = [f"H{i+1}" for i in range(12)]
         vals = [sav_scores[(lagna_rasi-1+i)%12] for i in range(12)]
         text_colors = ['#27ae60' if v >= 30 else '#e74c3c' if v < 25 else '#333333' for v in vals]
-        
-        fig_bar = go.Figure(data=[go.Bar(
-            x=vals, y=cats_labels, orientation='h', marker_color='#bdc3c7', 
-            text=[f"<b>{v}</b>" for v in vals], textposition='outside', textfont=dict(color=text_colors, size=14)
-        )])
+        fig_bar = go.Figure(data=[go.Bar(x=vals, y=cats_labels, orientation='h', marker_color='#bdc3c7', text=[f"<b>{v}</b>" for v in vals], textposition='outside', textfont=dict(color=text_colors, size=14))])
         fig_bar.add_vline(x=28, line_width=2, line_dash="dash", line_color="#7f8c8d", annotation_text="Average (28)", annotation_position="top right")
         fig_bar.update_layout(yaxis=dict(autorange="reversed"), margin=dict(l=20, r=20, t=40, b=20), height=400)
         st.plotly_chart(fig_bar, use_container_width=True)
-        
         c1, c2 = st.columns(2)
         sorted_houses = sorted([(sav_scores[(lagna_rasi-1+i)%12], i+1) for i in range(12)], key=lambda x: x[0], reverse=True)
         with c1:
             st.markdown("<h4 style='color: #27ae60; margin-bottom: 0px;'>Power Zones (Leverage These)</h4>", unsafe_allow_html=True)
-            for s, h in sorted_houses[:3]:
-                st.markdown(f"**H{h} - {s} Points:**\n{db_lev[h]}")
+            for s, h in sorted_houses[:3]: st.markdown(f"**H{h} - {s} Points:**\n{db_lev[h]}")
         with c2:
             st.markdown("<h4 style='color: #e74c3c; margin-bottom: 0px;'>Challenge Zones (Extra Effort)</h4>", unsafe_allow_html=True)
-            for s, h in sorted_houses[-3:]:
-                st.markdown(f"**H{h} - {s} Points:**\n{db_eff[h]}")
+            for s, h in sorted_houses[-3:]: st.markdown(f"**H{h} - {s} Points:**\n{db_eff[h]}")
 
     with t3:
         st.subheader("Education & Intellect")
@@ -962,7 +738,6 @@ if st.session_state.report_generated:
             st.markdown("#### Wealth")
             st.markdown(fc['Wealth'][0])
             st.markdown(f"> Remedy: {fc['Wealth'][1]}")
-        
         c3, c4 = st.columns(2)
         with c3:
             st.markdown("#### Relationships")
@@ -972,12 +747,10 @@ if st.session_state.report_generated:
             st.markdown("#### Age Focus")
             st.markdown(fc['Focus'][0])
             st.markdown(f"> Remedy: {fc['Focus'][1]}")
-            
         st.divider()
         st.subheader("Planetary Transits & Precision Timing")
         st.markdown("#### Macro Transits")
         for txt in transit_texts: st.markdown(txt.replace('\n', '  \n'))
-        
         if micro_transits:
             st.markdown("#### Micro-Transits")
             for mt in micro_transits:
@@ -990,14 +763,12 @@ if st.session_state.report_generated:
             st.markdown("#### IMMEDIATE FOCUS (Pratyantar Dasha)")
             st.markdown(f"You are currently in the micro-period of **{pd_info['PD']}** (operating under {pd_info['MD']} Major and {pd_info['AD']} Minor). This precise energy lasts from **{pd_info['Start']} to {pd_info['End']}**.")
             st.divider()
-        
         st.markdown("#### Phase Drill-Down (Detailed)")
         for p in phases:
             st.markdown(f"**{p['Type']}: {p['Phase']}**")
             st.markdown(f"> Duration: {p['Dates']}")
             st.markdown(p['Text'].replace('\n', '  \n'))
             st.divider()
-
         st.markdown("#### Life Chapters (Timeline)")
         planet_colors = {"Sun": "#d35400", "Moon": "#95a5a6", "Mars": "#c0392b", "Mercury": "#27ae60", "Jupiter": "#f39c12", "Venus": "#8e44ad", "Saturn": "#2c3e50", "Rahu": "#34495e", "Ketu": "#7f8c8d"}
         dasha_names = []
@@ -1009,7 +780,6 @@ if st.session_state.report_generated:
             e_year = int(row['Years'].split(' - ')[1])
             start_years.append(s_year)
             durations.append(e_year - s_year)
-            
         fig_timeline = go.Figure()
         fig_timeline.add_trace(go.Bar(
             y=['']*len(dasha_names), x=durations, base=start_years, name="Mahadashas", orientation='h',
@@ -1018,7 +788,6 @@ if st.session_state.report_generated:
         ))
         fig_timeline.update_layout(barmode='stack', height=100, margin=dict(l=0, r=0, t=10, b=0), template='plotly_white', showlegend=False, xaxis=dict(title=None, showticklabels=True), yaxis=dict(showticklabels=False, fixedrange=True))
         st.plotly_chart(fig_timeline, use_container_width=True)
-
         md_table_html = "<table style='width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px; margin-bottom: 20px;'><tr style='border-bottom: 2px solid #ddd; background-color: #fdfdfd;'><th style='padding: 10px 8px; text-align: left; width: 10%;'>Age</th><th style='padding: 10px 8px; text-align: left; width: 10%;'>Years</th><th style='padding: 10px 8px; text-align: left; width: 15%;'>Mahadasha</th><th style='padding: 10px 8px; text-align: left; width: 65%;'>Prediction</th></tr>"
         for row in mahadasha_data:
             s_year, e_year = row['Years'].split(' - ')
@@ -1042,9 +811,7 @@ if st.session_state.report_generated:
             else:
                 st.session_state.messages.append({"role": "user", "content": prompt_input})
                 with chat_container:
-                    with st.chat_message("user"):
-                        st.markdown(prompt_input)
-
+                    with st.chat_message("user"): st.markdown(prompt_input)
                     with st.chat_message("assistant"):
                         with st.spinner("The AI Astrologer is analyzing..."):
                             try:
