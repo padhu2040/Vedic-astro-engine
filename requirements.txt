@@ -5,4 +5,5 @@ geopy
 timezonefinder
 pytz
 fpdf2
+uharfbuzz
 google-generativeai
